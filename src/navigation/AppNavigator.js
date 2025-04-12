@@ -1,44 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from '../screens/user/homes/HomeScreen';
-import TourScreen from '../screens/user/tour/TourScreen';
-import AccountScreen from '../screens/user/account/AccountScreen';
-import OrderScreen from '../screens/user/order/OrderScreen';
-import TopBar from '../components/Top/TopBar';
-import BottomNav from '../components/Bottom/BottomNavi';
+import LoginScreen from '../screens/loginout/LogIn';
+import CustomerNavigator from './AppCustomer';
+import AdminNavigator from './AppAdmin';
+import { View } from 'react-native';
 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
-
-const MainTabs = () => (
-  <Tab.Navigator
-    tabBar={(props) => <BottomNav {...props} />}
-    screenOptions={{ headerShown: false }} // Tắt header cho tất cả các tab
-  >
-    <Tab.Screen name="homes" component={HomeScreen} />
-    <Tab.Screen name="tour" component={TourScreen} />
-    <Tab.Screen name="account" component={AccountScreen} />
-    <Tab.Screen name="order" component={OrderScreen} />
-  </Tab.Navigator>
-);
 
 const AppNavigator = () => {
+  const [userRole, setUserRole] = useState(null);
+
+  const handleLogin = ({ role }) => {
+    setUserRole(role); // Cập nhật vai trò để điều hướng
+  };
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false, // Tắt header mặc định của Stack
-        }}
-      >
-        <Stack.Screen
-          name="Main"
-          component={MainTabs}
-          options={{ headerShown: true, header: () => <TopBar /> }} // Bật header và chỉ dùng TopBar
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <View style={{ flex: 1 }}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {!userRole ? (
+            <Stack.Screen
+              name="Login"
+              component={(props) => <LoginScreen {...props} onLogin={handleLogin} />}
+            />
+          ) : userRole === 'admin' ? (
+            <Stack.Screen name="Admin" component={AdminNavigator} />
+          ) : (
+            <Stack.Screen name="Customer" component={CustomerNavigator} />
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </View>
   );
 };
 

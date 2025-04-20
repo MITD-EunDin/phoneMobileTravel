@@ -33,14 +33,6 @@ const CustomerNavigator = ({ navigation, route }) => {
         }}
       />
       <Tab.Screen
-        name="account"
-        component={AccountScreen}
-        options={{ 
-          header: (props) => <CommonHeader {...props} title="Tài khoản" />, 
-          headerShown: true 
-        }}
-      />
-      <Tab.Screen
         name="order"
         component={OrderScreen}
         options={{ 
@@ -48,6 +40,14 @@ const CustomerNavigator = ({ navigation, route }) => {
           headerShown: true 
         }}
       />
+        <Tab.Screen
+          name="account"
+          component={AccountScreen}
+          options={{ 
+            header: (props) => <CommonHeader {...props} title="Tài khoản" />, 
+            headerShown: true 
+          }}
+        />
     </Tab.Navigator>
   );
 };

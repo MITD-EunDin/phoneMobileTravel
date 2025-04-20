@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import styles from './ManageTourStysle';
+import styles from './menuStyle';
 
-const ManageTour = () => {
+const MenuScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>Đây là quản lý tour</Text>
+      <Text>Đây là menu tài khoản</Text>
     </View>
   );
 };
 
-export default ManageTour;
+export default MenuScreen;

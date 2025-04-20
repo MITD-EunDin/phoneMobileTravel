@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import styles from './ManageTourStysle';
+import styles from './NoticeStyle';
 
-const ManageTour = () => {
+const NoticeScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>Đây là quản lý tour</Text>
+      <Text>Đây là thông báo</Text>
     </View>
   );
 };
 
-export default ManageTour;
+export default NoticeScreen;

@@ -12,7 +12,7 @@ const AppNavigator = () => {
   const [userRole, setUserRole] = useState(null);
 
   const handleLogin = ({ role }) => {
-    setUserRole(role); // Cập nhật vai trò để điều hướng
+    setUserRole(role);
   };
 
   return (
@@ -22,7 +22,8 @@ const AppNavigator = () => {
           {!userRole ? (
             <Stack.Screen
               name="Login"
-              component={(props) => <LoginScreen {...props} onLogin={handleLogin} />}
+              component={LoginScreen} // Truyền trực tiếp LoginScreen
+              initialParams={{ onLogin: handleLogin }} // Truyền onLogin qua initialParams
             />
           ) : userRole === 'admin' ? (
             <Stack.Screen name="Admin" component={AdminNavigator} />

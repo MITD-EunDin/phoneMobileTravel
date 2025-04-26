@@ -5,7 +5,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     padding: 10,
-    paddingTop: 30, // Đẩy xuống để tránh notch/Dynamic Island
+    paddingTop: 30,
     backgroundColor: COLORS.blue,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.white,
     borderRadius: 20,
     paddingVertical: 5,
+    paddingLeft:10,
     marginRight: 10,
     backgroundColor: COLORS.white,
   },

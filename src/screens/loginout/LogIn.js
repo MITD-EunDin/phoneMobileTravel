@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import styles from './Instyle';
 
-const LoginScreen = ({ route }) => {
-  const { onLogin } = route.params; // Lấy onLogin từ route.params
+const LoginScreen = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('user'); // Mặc định là user
@@ -18,7 +17,7 @@ const LoginScreen = ({ route }) => {
 
     setLoading(true);
     setError('');
-    // Gọi onLogin với các tham số
+    // Giả lập đăng nhập, gọi onLogin để chuyển hướng
     onLogin({ username, password, role });
     setLoading(false);
   };

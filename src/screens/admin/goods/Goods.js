@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity } from 'react-native';
 import styles from './GoodsStyle.js';
-import { BadgePlus, ChevronRight } from 'lucide-react-native';
+import { BadgePlus } from 'lucide-react-native';
 
 const Goods = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -61,7 +61,10 @@ const Goods = ({ navigation }) => {
       <View style={styles.tourHeader}>
         <Text style={styles.tourCode}>{item.code}</Text>
         <TouchableOpacity style={styles.detailButton} activeOpacity={0.7}>
-          <Text style={styles.detailText}>Chi tiết</Text>
+          <Text style={styles.detailText}
+          onPress={() => navigation.navigate('DetailGoods')}
+          >
+            Chi tiết</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.statusContainer}>
@@ -106,7 +109,6 @@ const Goods = ({ navigation }) => {
       <TouchableOpacity
         style={styles.addButton}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate('AddTour')} // Thay 'AddTour' bằng màn hình thêm tour
       >
         <BadgePlus color="#fff" size={24} />
       </TouchableOpacity>

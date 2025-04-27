@@ -9,23 +9,34 @@ const styles = StyleSheet.create({
   },
   
   filterContainer: {
-    height:150,
-    padding:10,
-  },
-  firstflatList: {
-    backgroundColor: '#FBFBFB',
-    padding:10,
+    padding: 20,
     
   },
+  filterContent:{
+    backgroundColor:'#fff',
+    borderRadius:10,
+    padding:10,
+  },
+  filterRow: {
+    justifyContent: 'space-between', 
+    margin:10,
+  },
+  filterButton: {
+    flex: 1,
+    paddingVertical: 8,
+    marginHorizontal: 5, 
+    alignItems: 'center',
+   
+  },
+  
   filterText: {
     fontSize: 14,
-    color: '#333',
+    color: '#386AFF',
   },
   filterTextActive: {
     color: '#fff',
     fontWeight: 'bold',
   },
-
   header: {
     alignItems: 'center',
     width:'100%',

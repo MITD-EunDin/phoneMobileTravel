@@ -54,7 +54,7 @@ const filters = [
   '3N2D',
 ];
 
-const HomeScreen = () => {
+const HomeScreen = ({navigation}) => {
 
   const renderFilters = ({ item }) => (
     <TouchableOpacity
@@ -85,7 +85,9 @@ const HomeScreen = () => {
   }, []);
 
   const renderPopularTrip = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} 
+    onPress={()=>navigation.navigate('TourDetails', { tour:item })}
+    >
       <Image source={item.image} style={styles.cardImage} />
       <Text style={styles.cardTitle}>{item.title}</Text>
       {item.details.map((detail, index) => (
@@ -94,11 +96,14 @@ const HomeScreen = () => {
       <Text style={styles.cardPrice}>
         {item.price} <Text style={styles.currency}>vnd</Text>
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   const renderDiscountedTrip = ({ item }) => (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card}
+    conso
+    onPress={()=>navigation.navigate('TourDetails', { tour:item })}
+    >
       <Image source={item.image} style={styles.cardImage} />
       <Text style={styles.cardTitle}>{item.title}</Text>
       <Text style={styles.originalPrice}>
@@ -107,7 +112,7 @@ const HomeScreen = () => {
       <Text style={styles.cardPrice}>
         {item.price} <Text style={styles.currency}>vnd</Text>
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -116,6 +121,7 @@ const HomeScreen = () => {
         style={styles.filterContainer}
         source={require('../../../img/BR-user.png')}
       >
+        <View style={styles.filterContent}>
         <FlatList
           data={filters}
           renderItem={renderFilters}
@@ -124,6 +130,7 @@ const HomeScreen = () => {
           columnWrapperStyle={styles.filterRow}
           showsVerticalScrollIndicator={false}
         />
+        </View>
       </ImageBackground>
 
       <ImageBackground

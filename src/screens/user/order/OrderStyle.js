@@ -1,4 +1,6 @@
 import { StyleSheet, Dimensions } from 'react-native';
+const FILTER_BUTTON_WIDTH = 100; // Chiều rộng cho nút lọc
+const CARD_WIDTH = 300; // Chiều rộng cho card
 
 const styles= StyleSheet.create({
   scrollContainer: {

@@ -9,6 +9,7 @@ import Notice from "../screens/admin/notice/NoticeScreen";
 import CommonHeader from '../components/CommonHeader';
 import AddTour from "../screens/admin/addtour/AddTour";
 import DetailGoods from '../screens/admin/detailgoods/DetailGoods';
+import MgEmployee from "../screens/admin/mgemployee/EmployeeScreen";
 import { ChartPie, ShoppingBag, NotepadText,Hourglass ,ShieldUser   } from 'lucide-react-native';
 
 const Tab = createBottomTabNavigator();
@@ -99,6 +100,14 @@ const MainAdminNavigator = () => (
       component={DetailGoods}
       options={{
         header: (props) => <CommonHeader {...props} title="Chi tiết đơn" />,
+        headerShown: true,
+      }}
+    />
+    <Stack.Screen
+      name="MgEmployee"
+      component={MgEmployee}
+      options={{
+        header: (props) => <CommonHeader {...props} title="Nhân viên" />,
         headerShown: true,
       }}
     />

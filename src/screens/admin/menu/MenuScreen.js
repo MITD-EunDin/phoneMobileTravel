@@ -16,7 +16,7 @@ const MenuScreen = ( { navigation }) => {
           <SquareUserRound color="#666" size={24} />
           <Text style={styles.buttonText}>Khách hàng</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.menuButton, styles.rightButton]}>
+        <TouchableOpacity style={[styles.menuButton, styles.rightButton]} onPress={() => navigation.navigate('MgEmployee')}>
           <User color="#666" size={24} />
           <Text style={styles.buttonText}>Nhân viên</Text>
         </TouchableOpacity>

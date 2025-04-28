@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity } from 'react-native';
 import styles from './ManageTourStysle';
 import { BadgePlus, ChevronRight } from 'lucide-react-native';
+import AddTour from "../addtour/AddTour";
 
 const ManageTour = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,7 +88,7 @@ const ManageTour = ({ navigation }) => {
       <TouchableOpacity
         style={styles.addButton}
         activeOpacity={0.7}
-        onPress={() => navigation.navigate('AddTour')} // Thay 'AddTour' bằng màn hình thêm tour
+        onPress={() => navigation.navigate('AddTour')}
       >
         <BadgePlus color="#fff" size={24} />
       </TouchableOpacity>

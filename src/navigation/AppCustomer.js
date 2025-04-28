@@ -8,7 +8,7 @@ import BottomNav from '../components/Bottom/BottomNavi';
 import CommonHeader from '../components/CommonHeader'; // Import CommonHeader
 import TopBar from "../components/Top/TopBar";
 import { createStackNavigator } from '@react-navigation/stack';
-import TourDetails from '../screens/user/toudetail/TourDetail';
+// import TourDetails from '../screens/user/toudetail/TourDetail';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -19,11 +19,11 @@ const HomeStack = () => (
       component={HomeScreen}
       options={{ header: (props) => <TopBar />, headerShown: true }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="TourDetails"
       component={TourDetails}
       options={{ header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />, headerShown: true }}
-    />
+    /> */}
     
   </Stack.Navigator>
 );
@@ -35,11 +35,11 @@ const TourStack = () => (
       component={TourScreen}
       options={{ header: (props) => <CommonHeader {...props} title="Tour" />, headerShown: true }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="TourDetails"
       component={TourDetails}
       options={{ header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />, headerShown: true }}
-    />
+    /> */}
    
   </Stack.Navigator>
 );
@@ -51,11 +51,11 @@ const OrderStack = () => (
       component={OrderScreen}
       options={{ header: (props) => <CommonHeader {...props} title="Đơn hàng" />, headerShown: true }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="TourDetails"
       component={TourDetails}
       options={{ header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />, headerShown: true }}
-    />
+    /> */}
     
   </Stack.Navigator>
 );
@@ -68,11 +68,11 @@ const AccountStack = () => (
       component={AccountScreen}
       options={{ header: (props) => <CommonHeader {...props} title="Tài khoản" />, headerShown: true }}
     />
-    <Stack.Screen
+    {/* <Stack.Screen
       name="TourDetails"
       component={TourDetails}
       options={{ header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />, headerShown: true }}
-    />
+    /> */}
    
   </Stack.Navigator>
 );

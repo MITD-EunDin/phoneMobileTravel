@@ -12,9 +12,20 @@ const styles= StyleSheet.create({
   header: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#0973F7',
     textAlign: 'center',
     marginBottom: 20,
+  },
+  info:{
+    flexDirection:'row',
+    gap:10,
+    textAlign:'center',
+    marginBottom:10,
+  },
+  textInfo:{
+    fontWeight:'bold',
+    fontSize:13,
+    textAlign:'center',
   },
   form: {
     marginBottom: 20,

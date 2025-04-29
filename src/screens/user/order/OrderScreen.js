@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import styles from './OrderStyle';
 
-// Sample data for booked tours (you can replace this with API data)
 const bookedTours = [
   {
     id: '1',
     title: 'Hà Nội - Sapa 4 Ngày 3 Đêm',
     image: require('../../../img/image 2.png'),
     price: '4.390.000',
-    status: 'Chờ xác nhận',
+    status: 'Chờ xử lý',
   },
   {
     id: '2',
@@ -35,77 +34,91 @@ const bookedTours = [
 ];
 
 const OrderScreen = () => {
-  const [selectedStatus, setSelectedStatus] = useState('Chờ xử lý');
-  const statuses = ['Chờ xử lý', 'Chờ đi', 'Đang diễn ra', 'Hoàn thành','Đã hủy'];
+  const [selectedTab, setSelectedTab] = useState('Chờ xử lý');
+  const [tours, setTours] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const tabs = ['Chờ xử lý', 'Chờ đi', 'Đang đi', 'Đã đi', 'Đã hủy'];
 
-  // Filter tours based on selected status
-  const filteredTours = bookedTours.filter(
-    (tour) => tour.status === selectedStatus
-  );
+  useEffect(() => {
+    const fetchTours = async () => {
+      try {
+        setTours(bookedTours);
+      } catch (error) {
+        console.error('Lỗi khi lấy danh sách tour:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTours();
+  }, []);
 
-  const handleStatusPress = (status) => {
-    setSelectedStatus(status);
-  };
+  const filteredTours = tours.filter((tour) => tour.status === selectedTab);
 
-  const renderStatusFilter = ({ item }) => (
+  const renderTab = ({ item }) => (
     <TouchableOpacity
-      style={[
-        styles.statusButton,
-        selectedStatus === item && styles.statusButtonActive,
-      ]}
-      onPress={() => handleStatusPress(item)}
+      style={[styles.tabButton, selectedTab === item && styles.tabButtonActive]}
+      onPress={() => setSelectedTab(item)}
+      activeOpacity={0.7}
     >
       <Text
-        style={[
-          styles.statusText,
-          selectedStatus === item && styles.statusTextActive,
-        ]}
+        style={[styles.tabText, selectedTab === item && styles.tabTextActive]}
       >
         {item}
       </Text>
     </TouchableOpacity>
   );
 
-  const renderTour = ({ item }) => (
+  const renderBookedTour = ({ item }) => (
     <View style={styles.tourCard}>
-      <Image source={item.image} style={styles.tourImage} />
+      <Text style={styles.tourStatus}>{item.status}</Text>
       <View style={styles.tourInfo}>
+        <Image source={item.image} style={styles.tourImage} />
         <Text style={styles.tourTitle}>{item.title}</Text>
-        <Text style={styles.tourPrice}>
-          Tổng tiền: <Text style={styles.priceText}>{item.price} vnd</Text>
-        </Text>
       </View>
+      <Text style={styles.tourPrice}>Tổng tiền:{item.price} VND</Text>
+
     </View>
   );
 
+
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>Đang tải...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {/* Status Filter Section */}
-      <View style={styles.statusContainer}>
+
+      <View style={styles.tabContainer}>
         <FlatList
-          data={statuses}
-          renderItem={renderStatusFilter}
+          data={tabs}
+          renderItem={renderTab}
           keyExtractor={(item) => item}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.statusList}
+          contentContainerStyle={styles.tabList}
         />
       </View>
 
-      {/* Booked Tours List */}
-      {filteredTours.length > 0 ? (
-        <FlatList
-          data={filteredTours}
-          renderItem={renderTour}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.tourList}
-        />
-      ) : (
-        <Text style={styles.noToursText}>
-          Không có tour nào trong trạng thái này.
-        </Text>
-      )}
+      {/* Danh sách tour */}
+      <FlatList
+        data={filteredTours}
+        renderItem={renderBookedTour}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.tourList}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text>Danh sách trống</Text>
+          </View>
+        }
+      />
+
+
     </View>
   );
 };

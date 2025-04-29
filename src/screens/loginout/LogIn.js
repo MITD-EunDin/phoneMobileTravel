@@ -5,7 +5,7 @@ import styles from './Instyle';
 const LoginScreen = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('user'); // Mặc định là user
+  const [role, setRole] = useState('user'); 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,8 +17,8 @@ const LoginScreen = ({ onLogin }) => {
 
     setLoading(true);
     setError('');
-    // Giả lập đăng nhập, gọi onLogin để chuyển hướng
-    onLogin({ username, password, role });
+
+    onLogin({ username, role, rememberMe: true });
     setLoading(false);
   };
 
@@ -63,7 +63,6 @@ const LoginScreen = ({ onLogin }) => {
         </View>
       </View>
 
-      {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}

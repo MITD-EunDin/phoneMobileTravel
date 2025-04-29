@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppState, Alert } from 'react-native'; // Thêm Alert để thông báo
+import { AppState, Alert, ActivityIndicator, View } from 'react-native';
 import LoginScreen from '../screens/loginout/LogIn';
 import CustomerNavigator from './AppCustomer';
 import AdminNavigator from './AppAdmin';
-import { View } from 'react-native';
 
 const Stack = createStackNavigator();
 
@@ -14,6 +13,7 @@ const AppNavigator = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Kiểm tra trạng thái đăng nhập khi ứng dụng khởi động
   useEffect(() => {
     const checkUserData = async () => {
       try {
@@ -32,6 +32,7 @@ const AppNavigator = () => {
     checkUserData();
   }, []);
 
+  // Xử lý khi ứng dụng chuyển sang trạng thái background/inactive
   useEffect(() => {
     const handleAppStateChange = async (nextAppState) => {
       if (nextAppState === 'background' || nextAppState === 'inactive') {
@@ -42,6 +43,7 @@ const AppNavigator = () => {
             if (!parsedData.rememberMe) {
               await AsyncStorage.removeItem('userData');
               setUserData(null);
+              Alert.alert('Thông báo', 'Bạn đã bị đăng xuất do không chọn "Nhớ tôi".');
             }
           }
         } catch (error) {
@@ -50,10 +52,10 @@ const AppNavigator = () => {
       }
     };
 
-    AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
 
     return () => {
-      AppState.removeEventListener('change', handleAppStateChange);
+      subscription.remove();
     };
   }, []);
 
@@ -64,6 +66,7 @@ const AppNavigator = () => {
       setUserData(userData);
     } catch (error) {
       console.error('Lỗi khi lưu userData vào AsyncStorage:', error);
+      Alert.alert('Lỗi', 'Đăng nhập thất bại. Vui lòng thử lại.');
     }
   };
 
@@ -71,7 +74,7 @@ const AppNavigator = () => {
     try {
       await AsyncStorage.removeItem('userData');
       setUserData(null);
-      Alert.alert('Thông báo', 'Đăng xuất thành công!'); // Thêm thông báo
+      Alert.alert('Thông báo', 'Đăng xuất thành công!');
     } catch (error) {
       console.error('Lỗi khi đăng xuất:', error);
       Alert.alert('Lỗi', 'Đăng xuất thất bại. Vui lòng thử lại.');
@@ -79,27 +82,37 @@ const AppNavigator = () => {
   };
 
   if (loading) {
-    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f4f8' }}>
+        <ActivityIndicator size="large" color="#e74c3c" />
+      </View>
+    );
   }
 
   return (
     <View style={{ flex: 1 }}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          screenOptions={{ headerShown: false }}
+          initialRouteName={userData ? (userData.role === 'admin' ? 'Admin' : 'Customer') : 'Login'}
+        >
           {!userData ? (
             <Stack.Screen
               name="Login"
               component={(props) => <LoginScreen {...props} onLogin={handleLogin} />}
+              options={{ gestureEnabled: true }} // Không cho phép quay lại
             />
           ) : userData.role === 'admin' ? (
             <Stack.Screen
               name="Admin"
-              component={(props) => <AdminNavigator {...props} onLogout={handleLogout} />}
+              component={(props) => <AdminNavigator {...props} onLogout={handleLogout} setUserData={setUserData} userData={userData}/>}
+              options={{ gestureEnabled: false }}
             />
           ) : (
             <Stack.Screen
               name="Customer"
-              component={(props) => <CustomerNavigator {...props} onLogout={handleLogout} userData={userData} />}
+              component={(props) => <CustomerNavigator {...props} onLogout={handleLogout} setUserData={setUserData} userData={userData} />}
+              options={{ gestureEnabled: false }}
             />
           )}
         </Stack.Navigator>

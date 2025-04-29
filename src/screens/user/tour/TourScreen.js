@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView,Image } from 'react-native';
 import styles from './TourStyle';
 
 const TourScreen = ({ navigation }) => {
@@ -29,8 +29,12 @@ const TourScreen = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Vui Lòng Hoàn Thành Mẫu</Text>
-
-      {/* Form Fields */}
+      <View style={styles.info}>
+        <Image source={require('../../../img/infoimage.png')}
+        style={styles.infoImage}
+        />
+       <Text style={styles.textInfo}>Thông tin khách hàng</Text>
+      </View>
       <View style={styles.form}>
         <Text style={styles.label}>Họ và tên *</Text>
         <TextInput

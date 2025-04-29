@@ -1,13 +1,17 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity,Alert } from 'react-native';
 import styles from './menuStyle';
 import {User,SquareUserRound ,UsersRound,IdCard ,CircleAlert  } from "lucide-react-native";
 
-const MenuScreen = ( { navigation }) => {
+const MenuScreen = ( { navigation ,onLogout}) => {
 
-  const handleLogout = () => {
-    navigation.replace('Login');
-  };
+ const handleLogout = () => {
+     if (onLogout) {
+       onLogout(); // Trigger handleLogout from AppNavigator
+     } else {
+       Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+     }
+   };
 
   return (
     <View style={styles.container}>

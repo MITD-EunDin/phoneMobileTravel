@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, Alert, ScrollView, StatusBar } from 'react-native';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react-native';
+import { Eye, EyeOff } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './AccountStyle';
 
-
-const AccountScreen = ({ navigation }) => {
-  const [email, setEmail] = useState('example@email.com');
-  const [phone, setPhone] = useState('0123456789');
-  const [cccd, setCccd] = useState('123456789012');
-  const [password, setPassword] = useState('password123');
+const AccountScreen = ({ navigation, onLogout }) => {
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [cccd, setCccd] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -18,9 +18,36 @@ const AccountScreen = ({ navigation }) => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSave = () => {
-    // Logic to save the updated information
-    Alert.alert('Thông báo', 'Thông tin đã được lưu.');
+  // Fetch user data on mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const storedUserData = await AsyncStorage.getItem('userData');
+        if (storedUserData) {
+          const parsedData = JSON.parse(storedUserData);
+          setEmail(parsedData.email || 'example@email.com');
+          setPhone(parsedData.phone || '0123456789');
+          setCccd(parsedData.cccd || '123456789012');
+          setPassword(parsedData.password || 'password123');
+        }
+      } catch (error) {
+        console.error('Lỗi khi lấy userData từ AsyncStorage:', error);
+        Alert.alert('Lỗi', 'Không thể tải thông tin tài khoản.');
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const updatedUserData = { email, phone, cccd, password };
+      await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
+      Alert.alert('Thông báo', 'Thông tin đã được lưu.');
+    } catch (error) {
+      console.error('Lỗi khi lưu userData:', error);
+      Alert.alert('Lỗi', 'Không thể lưu thông tin.');
+    }
   };
 
   const handleChangePassword = () => {
@@ -39,20 +66,15 @@ const AccountScreen = ({ navigation }) => {
   };
 
   const handleLogout = () => {
-    // Logic to handle logout
-    Alert.alert('Thông báo', 'Đã đăng xuất.');
+    if (onLogout) {
+      onLogout(); // Trigger handleLogout from AppNavigator
+    } else {
+      Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+    }
   };
 
   return (
     <View style={styles.mainContainer}>
-      {/* Top Bar Header
-      <View style={styles.header}>
-        <StatusBar backgroundColor={COLORS.blue} barStyle="light-content" />
-        <BackButton onPress={() => navigation.goBack()}/>
-        <Text style={styles.headerTitle}>Thông tin tài khoản</Text>
-        <View style={styles.headerRight} />
-      </View> */}
-
       <ScrollView style={styles.container}>
         <Image source={require('../../../img/account.png')} style={styles.profileImage} />
 

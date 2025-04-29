@@ -1,47 +1,7 @@
-import React, { useRef,useEffect } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, ImageBackground, Animated } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, Image, FlatList, TouchableOpacity, ScrollView, ImageBackground, Animated } from 'react-native'
 import styles from './HomeStyle';
-
-const popularTrips = [
-  {
-    id: '1',
-    title: 'Hà Nội - Sapa 4 Ngày 3 Đêm',
-    image: require('../../../img/image 2.png'),
-    details: ['4 ngày 3 đêm', 'Hàng Tuần', 'Khởi hành 2-3 sao'],
-    price: '4.390.000',
-  },
-  {
-    id: '2',
-    title: 'Hà Nội - Sapa 4 Ngày 3 Đêm',
-    image: require('../../../img/image 2.png'),
-    details: ['4 ngày 3 đêm', 'Hàng Tuần', 'Khởi hành 2-3 sao'],
-    price: '4.390.000',
-  },
-  {
-    id: '3',
-    title: 'Hà Nội - Sapa 4 Ngày 3 Đêm',
-    image: require('../../../img/image 2.png'),
-    details: ['4 ngày 3 đêm', 'Hàng Tuần', 'Khởi hành 2-3 sao'],
-    price: '4.390.000',
-  },
-];
-
-const discountedTrips = [
-  {
-    id: '3',
-    title: 'Khám Phá Xứ Sở Kim Chi - Seoul, Đảo Nami - Everland',
-    image: require('../../../img/image 3.png'),
-    originalPrice: '14.900.000',
-    price: '13.900.000',
-  },
-  {
-    id: '4',
-    title: 'Khám Phá Xứ Sở Kim Chi - Seoul, Đảo Nami - Everland',
-    image: require('../../../img/image 3.png'),
-    originalPrice: '14.900.000',
-    price: '13.900.000',
-  },
-];
+import tourData from '../../tourData';
 
 const filters = [
   'Miền bắc',
@@ -54,8 +14,25 @@ const filters = [
   '3N2D',
 ];
 
-const HomeScreen = ({navigation}) => {
+const detailIcons = {
+  duration: require('../../../img/duration.png'), 
+  frequency: require('../../../img/frequency.png'), 
+  transport: require('../../../img/transport.png'), 
+  hotel:require('../../../img/hotel.png'), 
+};
 
+const HomeScreen = ({ navigation }) => {
+  const airplaneAnim = useRef(new Animated.Value(-300)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(airplaneAnim, {
+        toValue: 400,
+        duration: 10000,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
   const renderFilters = ({ item }) => (
     <TouchableOpacity
       style={[
@@ -72,27 +49,53 @@ const HomeScreen = ({navigation}) => {
       </Text>
     </TouchableOpacity>
   );
-  const airplaneAnim = useRef(new Animated.Value(-300)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(airplaneAnim, {
-        toValue: 400,
-        duration: 10000,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, []);
 
   const renderPopularTrip = ({ item }) => (
-    <TouchableOpacity style={styles.card} 
-    onPress={()=>navigation.navigate('TourDetails', { tour:item })}
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate('TourDetails', { tour: item })}
     >
       <Image source={item.image} style={styles.cardImage} />
       <Text style={styles.cardTitle}>{item.title}</Text>
-      {item.details.map((detail, index) => (
-        <Text key={index} style={styles.cardDetail}>• {detail}</Text>
-      ))}
+      {item.duration && (
+        <View style={styles.detailContainer}>
+          <Image
+            source={detailIcons.duration}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.cardDetail}>{item.duration}</Text>
+        </View>
+      )}
+      {item.frequency && (
+        <View style={styles.detailContainer}>
+          <Image
+            source={detailIcons.frequency}
+            size={16}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.cardDetail}>{item.frequency}</Text>
+        </View>
+      )}
+      {item.transport && (
+        <View style={styles.detailContainer}>
+          <Image
+            source={detailIcons.transport}
+            size={16}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.cardDetail}>{item.transport}</Text>
+        </View>
+      )}
+      {item.hotel && (
+        <View style={styles.detailContainer}>
+          <Image
+            source={detailIcons.hotel}
+            size={16}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.cardDetail}>{item.hotel}</Text>
+        </View>
+      )}
       <Text style={styles.cardPrice}>
         {item.price} <Text style={styles.currency}>vnd</Text>
       </Text>
@@ -100,12 +103,52 @@ const HomeScreen = ({navigation}) => {
   );
 
   const renderDiscountedTrip = ({ item }) => (
-    <TouchableOpacity style={styles.card}
-    conso
-    onPress={()=>navigation.navigate('TourDetails', { tour:item })}
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => navigation.navigate('TourDetails', { tour: item })}
     >
       <Image source={item.image} style={styles.cardImage} />
       <Text style={styles.cardTitle}>{item.title}</Text>
+      {item.duration && (
+        <View style={styles.detailContainer}>
+          <Image
+            source={detailIcons.duration}
+            size={16}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.cardDetail}>{item.duration}</Text>
+        </View>
+      )}
+      {item.frequency && (
+        <View style={styles.detailContainer}>
+          <Image
+            source={detailIcons.frequency}
+            size={16}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.cardDetail}>{item.frequency}</Text>
+        </View>
+      )}
+      {item.transport && (
+        <View style={styles.detailContainer}>
+          <Image
+            source={detailIcons.transport}
+            size={16}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.cardDetail}>{item.transport}</Text>
+        </View>
+      )}
+      {item.hotel && (
+        <View style={styles.detailContainer}>
+          <Image
+            source={detailIcons.hotel}
+            size={16}
+            style={styles.detailIcon}
+          />
+          <Text style={styles.cardDetail}>{item.hotel}</Text>
+        </View>
+      )}
       <Text style={styles.originalPrice}>
         {item.originalPrice} <Text style={styles.currency}>vnd</Text>
       </Text>
@@ -122,14 +165,14 @@ const HomeScreen = ({navigation}) => {
         source={require('../../../img/BR-user.png')}
       >
         <View style={styles.filterContent}>
-        <FlatList
-          data={filters}
-          renderItem={renderFilters}
-          keyExtractor={(item) => item}
-          numColumns={4}
-          columnWrapperStyle={styles.filterRow}
-          showsVerticalScrollIndicator={false}
-        />
+          <FlatList
+            data={filters}
+            renderItem={renderFilters}
+            keyExtractor={(item) => item}
+            numColumns={4}
+            columnWrapperStyle={styles.filterRow}
+            showsVerticalScrollIndicator={false}
+          />
         </View>
       </ImageBackground>
 
@@ -139,7 +182,7 @@ const HomeScreen = ({navigation}) => {
       >
         <Animated.Image
           source={require('../../../img/plane.png')}
-          style={[styles.airplane,{ transform: [{ translateX:airplaneAnim  }]},]}
+          style={[styles.airplane, { transform: [{ translateX: airplaneAnim }] }]}
         />
       </ImageBackground>
       <ImageBackground
@@ -148,7 +191,7 @@ const HomeScreen = ({navigation}) => {
       >
         <Text style={styles.sectionTitle}>Phổ biến</Text>
         <FlatList
-          data={popularTrips}
+          data={tourData.popularTrips}
           renderItem={renderPopularTrip}
           keyExtractor={(item) => item.id}
           horizontal
@@ -162,7 +205,7 @@ const HomeScreen = ({navigation}) => {
       >
         <Text style={styles.sectionTitle}>Ưu đãi giảm giá</Text>
         <FlatList
-          data={discountedTrips}
+          data={tourData.discountedTrips}
           renderItem={renderDiscountedTrip}
           keyExtractor={(item) => item.id}
           horizontal

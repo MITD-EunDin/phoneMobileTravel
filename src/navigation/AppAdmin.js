@@ -4,7 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import DashboardScreen from '../screens/admin/dashbroad/DashBroad';
 import Goods from '../screens/admin/goods/Goods';
 import ManageTour from "../screens/admin/managetour/ManageTour";
-import Menu from "../screens/admin/menu/MenuScreen";
+import MenuScreen from "../screens/admin/menu/MenuScreen";
 import Notice from "../screens/admin/notice/NoticeScreen";
 import CommonHeader from '../components/CommonHeader';
 import AddTour from "../screens/admin/addtour/AddTour";
@@ -15,7 +15,7 @@ import { ChartPie, ShoppingBag, NotepadText,Hourglass ,ShieldUser   } from 'luci
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const AdminNavigator = () => (
+const AdminNavigator = ({onLogout}) => (
   <Tab.Navigator
     // tabBar={(props) => <BottomNav {...props} />}
     // screenOptions={{
@@ -68,7 +68,7 @@ const AdminNavigator = () => (
     />
     <Tab.Screen
       name="Tài khoản"
-      component={Menu}
+      component={(props) => <MenuScreen {...props} onLogout={onLogout} />}
       options={{
         header: (props) => <CommonHeader {...props} title="Tài khoản" />,
         headerShown: true,
@@ -80,12 +80,11 @@ const AdminNavigator = () => (
   </Tab.Navigator>
 );
 
-const MainAdminNavigator = () => (
+const MainAdminNavigator = ({navigation,onLogout}) => (
   <Stack.Navigator>
     <Stack.Screen
       name="AdminTabs"
-      component={AdminNavigator}
-      options={{ headerShown: false }} // Ẩn header của stack để tab hiển thị
+      component={(props) => <AdminNavigator {...props} onLogout={onLogout} />}      options={{ headerShown: false }} // Ẩn header của stack để tab hiển thị
     />
     <Stack.Screen
       name="AddTour"

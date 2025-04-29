@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     padding:10,
     paddingBottom:30,
   },
+  
   discountedTripsContainer:{
     paddingTop:40,
     padding:10,
@@ -61,6 +62,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#EB6A58',
     marginBottom: 10,
+  },
+  detailContainer:{
+    paddingLeft:5,
+    flexDirection:'row',
   },
   flatList: {
     paddingBottom: 20,
@@ -78,6 +83,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     marginRight: 10,
     overflow: 'hidden',
+    width:190,
   },
   cardImage: {
     width: '100%',

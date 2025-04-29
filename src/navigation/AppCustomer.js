@@ -1,93 +1,95 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from '../screens/user/homes/HomeScreen';
 import TourScreen from '../screens/user/tour/TourScreen';
 import AccountScreen from '../screens/user/account/AccountScreen';
 import OrderScreen from '../screens/user/order/OrderScreen';
-import BottomNav from '../components/Bottom/BottomNavi';
-import CommonHeader from '../components/CommonHeader'; // Import CommonHeader
-import TopBar from "../components/Top/TopBar";
-import { createStackNavigator } from '@react-navigation/stack';
-// import TourDetails from '../screens/user/toudetail/TourDetail';
+
+import TourDetails from '../screens/user/toudetail/TourDetail';
+import CommonHeader from '../components/CommonHeader';
+import TopBar from"../components/Top/TopBar";
+import { Home, Map, ShoppingBag, User } from 'lucide-react-native'; // Import icons
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-const HomeStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
+
+// Customer Tab Navigator
+const CustomerTabNavigator = ({ onLogout }) => (
+  <Tab.Navigator
+    screenOptions={{
+      headerShown: true,
+    }}
+  >
+    <Tab.Screen
       name="Home"
       component={HomeScreen}
-      options={{ header: (props) => <TopBar />, headerShown: true }}
+      options={{
+        header: (props) => <TopBar {...props}  title="Trang chủ"/>,
+        tabBarIcon: ({ color, size, focused }) => (
+          <Home color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
+        ),
+      }}
     />
-    {/* <Stack.Screen
-      name="TourDetails"
-      component={TourDetails}
-      options={{ header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />, headerShown: true }}
-    /> */}
-    
-  </Stack.Navigator>
-);
 
-const TourStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
+    <Tab.Screen
+
       name="Tour"
       component={TourScreen}
-      options={{ header: (props) => <CommonHeader {...props} title="Tour" />, headerShown: true }}
+      options={{
+        header: (props) => <CommonHeader {...props} title="Tour" />,
+        tabBarIcon: ({ color, size, focused }) => (
+          <Map color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
+        ),
+      }}
     />
-    {/* <Stack.Screen
-      name="TourDetails"
-      component={TourDetails}
-      options={{ header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />, headerShown: true }}
-    /> */}
-   
-  </Stack.Navigator>
-);
 
-const OrderStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
+    <Tab.Screen
       name="Order"
       component={OrderScreen}
-      options={{ header: (props) => <CommonHeader {...props} title="Đơn hàng" />, headerShown: true }}
+      options={{
+        header: (props) => <CommonHeader {...props} title="Đơn hàng" />,
+        tabBarIcon: ({ color, size, focused }) => (
+          <ShoppingBag color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
+        ),
+      }}
     />
-    {/* <Stack.Screen
-      name="TourDetails"
-      component={TourDetails}
-      options={{ header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />, headerShown: true }}
-    /> */}
-    
-  </Stack.Navigator>
-);
 
-// Stack Navigator cho tab Tài khoản
-const AccountStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen
+    <Tab.Screen
       name="Account"
-      component={AccountScreen}
-      options={{ header: (props) => <CommonHeader {...props} title="Tài khoản" />, headerShown: true }}
+      component={(props) => <AccountScreen {...props} onLogout={onLogout} />}
+      options={{
+        header: (props) => <CommonHeader {...props} title="Tài khoản" />,
+        tabBarIcon: ({ color, size, focused }) => (
+          <User color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
+        ),
+      }}
     />
-    {/* <Stack.Screen
-      name="TourDetails"
-      component={TourDetails}
-      options={{ header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />, headerShown: true }}
-    /> */}
-   
-  </Stack.Navigator>
+
+  </Tab.Navigator>
 );
 
-const CustomerNavigator = ({ navigation, route }) => {
+// Main Customer Navigator (Stack wrapping Tab)
+const CustomerNavigator = ({ navigation, onLogout }) => {
+
   return (
-    <Tab.Navigator
-      tabBar={(props) => <BottomNav {...props} />}
-      screenOptions={{ headerShown: false }}
-    >
-      <Tab.Screen name="homes" component={HomeStack} />
-      <Tab.Screen name="tour" component={TourStack} />
-      <Tab.Screen name="order" component={OrderStack} />
-      <Tab.Screen name="account" component={AccountStack} />
-    </Tab.Navigator>
+    <Stack.Navigator>
+      <Stack.Screen
+        name="CustomerTabs"
+        component={(props) => <CustomerTabNavigator {...props} onLogout={onLogout} />}
+        options={{ headerShown: false }} // Hide stack header for tab navigator
+      />
+      <Stack.Screen
+        name="TourDetails"
+        component={TourDetails}
+        options={{
+          header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />,
+          headerShown: true,
+        }}
+      />
+    </Stack.Navigator>
   );
 };
+
 export default CustomerNavigator;

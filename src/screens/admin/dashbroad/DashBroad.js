@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { CircleUser } from 'lucide-react-native';
 import styles from './BroadStysle.js';
-
+import { COLORS } from '../../../stysles/theme.js';
 const DashBroad = () => {
   const [selectedTab, setSelectedTab] = useState('Hôm nay');
 
@@ -49,7 +49,7 @@ const DashBroad = () => {
   const renderEmployee = ({ item }) => (
     <View style={styles.tableRow}>
       <View style={[styles.tableCell, { flex: 2, flexDirection: 'row', alignItems: 'center' }]}>
-        <CircleUser color="#999" size={24} />
+        <CircleUser color={COLORS.gray} size={24} />
         <Text style={styles.employeeName}>{item.name}</Text>
       </View>
       <Text style={[styles.tableCell, { flex: 1 }]}>{item.revenue}</Text>

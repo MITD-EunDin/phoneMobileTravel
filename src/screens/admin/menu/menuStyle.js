@@ -1,4 +1,5 @@
 import { StyleSheet,Dimensions } from 'react-native';
+import { COLORS } from '../../../stysles/theme';
 const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
@@ -17,9 +18,9 @@ const styles = StyleSheet.create({
   menuButton: {
     flexDirection: 'columns', 
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLORS.lightGrey,
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
@@ -39,9 +40,9 @@ const styles = StyleSheet.create({
   menuButton1: {
     flexDirection: 'row', 
     alignItems: 'center',
-    backgroundColor: '#fff', 
+    backgroundColor: COLORS.white, 
     borderWidth: 1, 
-    borderColor: '#ddd', 
+    borderColor: COLORS.lightGrey, 
     borderRadius: 10, 
     padding: 15,
     marginBottom: 10, 
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     marginTop: 20, 
   },
   logoutButton: {
-    backgroundColor: '#ff6b81', 
+    backgroundColor: COLORS.red, 
     borderRadius: 20, 
     paddingVertical: 10,
     paddingHorizontal: 30,
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 16,
-    color: '#fff', 
+    color: COLORS.white, 
     fontWeight: 'bold',
   },
 });

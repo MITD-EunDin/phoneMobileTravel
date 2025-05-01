@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import { COLORS } from '../../../stysles/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -10,15 +11,15 @@ const styles = StyleSheet.create({
   tabContainer: {
     paddingHorizontal: 15,
     paddingVertical: 10,
-    backgroundColor: '#fff', // Nền trắng cho thanh tab
+    backgroundColor: COLORS.white, 
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: COLORS.grey,
   },
   tabList: {
     paddingHorizontal: 5,
   },
   tabButton: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 20,
@@ -27,16 +28,16 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   tabButtonActive: {
-    backgroundColor: '#007bff', // Màu xanh khi tab được chọn
-    borderColor: '#007bff',
+    backgroundColor: COLORS.blue, 
+    borderColor: COLORS.blue,
   },
   tabText: {
     fontSize: 14,
-    color: '#333',
+    color: COLORS.black,
     fontWeight: '500',
   },
   tabTextActive: {
-    color: '#fff',
+    color: COLORS.white,
     fontWeight: '600',
   },
   noticeList: {
@@ -44,7 +45,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   noticeCard: {
-    backgroundColor: '#e6f0ff', // Nền xanh nhạt giống hình ảnh
+    backgroundColor: '#e6f0ff', 
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
   noticeCode: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.black,
     marginBottom: 5,
   },
   noticeDescription: {

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity } from 'react-native';
 import styles from './GoodsStyle.js';
-import { BadgePlus } from 'lucide-react-native';
+import { BadgePlus, User, ShoppingBag, FolderDown  } from 'lucide-react-native';
+import { COLORS } from '../../../stysles/theme.js';
 
 const Goods = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -11,7 +12,7 @@ const Goods = ({ navigation }) => {
       id: '1',
       code: '12345',
       status: 'Chờ xử lý',
-      statusColor: '#ff69b4', // Hồng
+      statusColor: '#58B539',
       customerName: 'NGUYỄN THỊ TRINH',
       tourName: 'Sapa–Lào Cai 4 ngày 3 đêm',
       phone: '012345678',
@@ -31,7 +32,7 @@ const Goods = ({ navigation }) => {
       id: '3',
       code: '12345',
       status: 'Đang hoạt động',
-      statusColor: '#1e90ff', // Xanh dương
+      statusColor: COLORS.blue,
       customerName: 'NGUYỄN THỊ TRINH',
       tourName: 'Sapa–Lào Cai 4 ngày 3 đêm',
       phone: '012345678',
@@ -41,7 +42,7 @@ const Goods = ({ navigation }) => {
       id: '4',
       code: '12345',
       status: 'Đã hoàn thành',
-      statusColor: '#ff69b4', // Hồng
+      statusColor: '#8F43F1',
       customerName: 'NGUYỄN THỊ TRINH',
       tourName: 'Sapa–Lào Cai 4 ngày 3 đêm',
       phone: '012345678',
@@ -73,11 +74,22 @@ const Goods = ({ navigation }) => {
         </View>
         <Text style={styles.timeText}>9:12</Text>
       </View>
-      <Text style={styles.customerName}>{item.customerName}</Text>
-      <Text style={styles.tourName}>{item.tourName}</Text>
-      <Text style={styles.phone}>{item.phone}</Text>
-      <Text style={styles.price}>{item.price}</Text>
+      <View style={styles.infoContanier}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "center" }}>
+          <User color={COLORS.gray} size={20}/>
+          <Text style={styles.customerName}>{item.customerName}</Text>
+        </View>
+        <Text style={styles.phone}>{item.phone}</Text>
+      </View>
+      <View style={styles.infoContanier}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <ShoppingBag color={COLORS.gray} size={20}/>
+          <Text style={styles.tourName}>{item.tourName}</Text>
+        </View>
+        <Text style={styles.price}>{item.price}</Text>
+      </View>
       <TouchableOpacity style={styles.printButton} activeOpacity={0.7}>
+        <FolderDown color={ COLORS.blue} size={22} />
         <Text style={styles.printText}>In đơn</Text>
       </TouchableOpacity>
     </View>
@@ -110,7 +122,7 @@ const Goods = ({ navigation }) => {
         style={styles.addButton}
         activeOpacity={0.7}
       >
-        <BadgePlus color="#fff" size={24} />
+        <BadgePlus color={COLORS.white} size={24} />
       </TouchableOpacity>
     </View>
   );

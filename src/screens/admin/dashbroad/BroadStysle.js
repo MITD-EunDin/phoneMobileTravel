@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   section: {
-    backgroundColor: '#fff', // Nền trắng cho section
+    backgroundColor: COLORS.white, // Nền trắng cho section
     padding: 15,
     borderRadius: 8, // Bo góc nhẹ
     marginBottom: 10,
@@ -15,7 +15,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.black,
     marginBottom: 10,
   },
   statsRow: {
@@ -28,13 +28,13 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.gray,
     marginBottom: 5,
   },
   statValue: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.black,
   },
 
 
@@ -45,9 +45,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   tabItem: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: COLORS.lightGrey,
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 15,
@@ -55,19 +55,17 @@ const styles = StyleSheet.create({
   },
   tabItemSelected: {
     backgroundColor: COLORS.blue, 
-    borderColor: '#007bff',
+    borderColor: COLORS.lightGrey,
   },
   tabText: {
     fontSize: 14,
-    color: '#333',
+    color: COLORS.black,
     fontWeight: '500',
   },
   tabTextSelected: {
-    color: '#fff',
+    color: COLORS.white,
     fontWeight: '600',
   },
-
-
 
   table: {
     borderWidth: 1,
@@ -85,7 +83,7 @@ const styles = StyleSheet.create({
   tableHeaderCell: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#333',
+    color: COLORS.black,
     textAlign: 'center',
   },
   tableRow: {
@@ -96,12 +94,12 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     fontSize: 14,
-    color: '#333',
+    color: COLORS.black,
     textAlign: 'center',
   },
   employeeName: {
     fontSize: 14,
-    color: '#333',
+    color: COLORS.black,
     marginLeft: 10,
   },
 });

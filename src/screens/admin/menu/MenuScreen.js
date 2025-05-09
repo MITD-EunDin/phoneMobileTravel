@@ -1,17 +1,21 @@
 import React from 'react';
-import { View, Text, TouchableOpacity,Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { useAuth } from '../../../contexts/AuthContext';
 import styles from './menuStyle';
-import {User,SquareUserRound ,UsersRound,IdCard ,CircleAlert  } from "lucide-react-native";
+import { SquareUserRound, User, UsersRound, IdCard, CircleAlert } from 'lucide-react-native';
 import { COLORS } from '../../../stysles/theme';
-const MenuScreen = ( { navigation ,onLogout}) => {
 
- const handleLogout = () => {
-     if (onLogout) {
-       onLogout(); // Trigger handleLogout from AppNavigator
-     } else {
-       Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
-     }
-   };
+const MenuScreen = ({ navigation }) => {
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout(); // Chỉ gọi logout, AppNavigator sẽ xử lý điều hướng
+    } catch (error) {
+      console.error('Logout error:', error);
+      Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+    }
+  };
 
   return (
     <View style={styles.container}>

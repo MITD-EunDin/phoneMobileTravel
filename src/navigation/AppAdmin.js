@@ -3,31 +3,29 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import DashboardScreen from '../screens/admin/dashbroad/DashBroad';
 import Goods from '../screens/admin/goods/Goods';
-import ManageTour from "../screens/admin/managetour/ManageTour";
-import MenuScreen from "../screens/admin/menu/MenuScreen";
-import Notice from "../screens/admin/notice/NoticeScreen";
+import ManageTour from '../screens/admin/managetour/ManageTour';
+import MenuScreen from '../screens/admin/menu/MenuScreen';
+import Notice from '../screens/admin/notice/NoticeScreen';
 import CommonHeader from '../components/CommonHeader';
-import AddTour from "../screens/admin/addtour/AddTour";
+import AddTour from '../screens/admin/addtour/AddTour';
 import DetailGoods from '../screens/admin/detailgoods/DetailGoods';
-import MgEmployee from "../screens/admin/mgemployee/EmployeeScreen";
-import { ChartPie, ShoppingBag, NotepadText,Hourglass ,ShieldUser   } from 'lucide-react-native';
+import MgEmployee from '../screens/admin/mgemployee/EmployeeScreen';
+import { ChartPie, ShoppingBag, NotepadText, Hourglass, ShieldUser } from 'lucide-react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-const AdminNavigator = ({onLogout}) => (
+const AdminTabNavigator = ({ onLogout }) => (
   <Tab.Navigator
-    // tabBar={(props) => <BottomNav {...props} />}
-    // screenOptions={{
-    //   header: () => <TopBar />,
-    // }}
+    screenOptions={{
+      headerShown: true,
+    }}
   >
     <Tab.Screen
       name="Dashboard"
       component={DashboardScreen}
       options={{
         header: (props) => <CommonHeader {...props} title="Thống kê" />,
-        headerShown: true,
         tabBarIcon: ({ color, size, focused }) => (
           <ChartPie color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
@@ -38,7 +36,6 @@ const AdminNavigator = ({onLogout}) => (
       component={Goods}
       options={{
         header: (props) => <CommonHeader {...props} title="Đơn hàng" />,
-        headerShown: true,
         tabBarIcon: ({ color, size, focused }) => (
           <ShoppingBag color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
@@ -49,7 +46,6 @@ const AdminNavigator = ({onLogout}) => (
       component={ManageTour}
       options={{
         header: (props) => <CommonHeader {...props} title="Quản lý tour" />,
-        headerShown: true,
         tabBarIcon: ({ color, size, focused }) => (
           <NotepadText color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
@@ -60,7 +56,6 @@ const AdminNavigator = ({onLogout}) => (
       component={Notice}
       options={{
         header: (props) => <CommonHeader {...props} title="Thông báo" />,
-        headerShown: true,
         tabBarIcon: ({ color, size, focused }) => (
           <Hourglass color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
@@ -68,24 +63,26 @@ const AdminNavigator = ({onLogout}) => (
     />
     <Tab.Screen
       name="Tài khoản"
-      component={(props) => <MenuScreen {...props} onLogout={onLogout} />}
       options={{
         header: (props) => <CommonHeader {...props} title="Tài khoản" />,
-        headerShown: true,
         tabBarIcon: ({ color, size, focused }) => (
           <ShieldUser color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
       }}
-    />
+    >
+      {(props) => <MenuScreen {...props} onLogout={onLogout} />}
+    </Tab.Screen>
   </Tab.Navigator>
 );
 
-const MainAdminNavigator = ({navigation,onLogout}) => (
+const AdminNavigator = ({ onLogout }) => (
   <Stack.Navigator>
     <Stack.Screen
       name="AdminTabs"
-      component={(props) => <AdminNavigator {...props} onLogout={onLogout} />}      options={{ headerShown: false }} // Ẩn header của stack để tab hiển thị
-    />
+      options={{ headerShown: false }}
+    >
+      {(props) => <AdminTabNavigator {...props} onLogout={onLogout} />}
+    </Stack.Screen>
     <Stack.Screen
       name="AddTour"
       component={AddTour}
@@ -112,4 +109,5 @@ const MainAdminNavigator = ({navigation,onLogout}) => (
     />
   </Stack.Navigator>
 );
-export default MainAdminNavigator;
+
+export default AdminNavigator;

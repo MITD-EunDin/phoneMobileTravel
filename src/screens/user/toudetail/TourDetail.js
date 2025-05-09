@@ -1,127 +1,180 @@
-import React, {useState}from 'react';
-import { View, Text, Image, ScrollView, StyleSheet,TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useState, useRef } from 'react';
+import { View, Text, Image, FlatList, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import styles from './DetailStyle';
-const detailIcons = {
-  duration: require('../../../img/duration.png'), 
-  frequency: require('../../../img/frequency.png'), 
-  transport: require('../../../img/transport.png'), 
-  hotel:require('../../../img/hotel.png'), 
-};
+
+const { width } = Dimensions.get('window');
+const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/600x400.png?text=Image+Not+Available';
 
 const TourDetails = ({ route }) => {
   const { tour } = route.params;
-  const [isExpanded, setIsExpanded] = useState(false); 
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const flatListRef = useRef(null);
 
-  const getShortDescription = (description) => {
-    const lines = description.split('\n');
-    return lines.slice(0, 12).join('\n')
+  // Lấy danh sách ảnh từ tour.images hoặc dùng image làm fallback
+  const images = tour.images && tour.images.length > 0 ? tour.images : [tour.image || PLACEHOLDER_IMAGE];
+
+  // Xử lý khi vuốt đến ảnh mới
+  const onScroll = (event) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(contentOffsetX / width);
+    setCurrentImageIndex(index);
   };
+
+  // Render từng ảnh trong carousel
+  const renderImage = ({ item }) => (
+    <Image
+      source={{ uri: item || PLACEHOLDER_IMAGE }}
+      style={stylesLocal.carouselImage}
+      resizeMode="cover"
+      onError={(e) => console.warn(`Lỗi tải ảnh tour ${tour.tourName}: ${item || 'No image URL'}`, e.nativeEvent.error)}
+    />
+  );
+
+  // Render dots chỉ báo
+  const renderDots = () => (
+    <View style={stylesLocal.dotsContainer}>
+      {images.map((_, index) => (
+        <View
+          key={index}
+          style={[
+            stylesLocal.dot,
+            currentImageIndex === index ? stylesLocal.activeDot : stylesLocal.inactiveDot,
+          ]}
+        />
+      ))}
+    </View>
+  );
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Image source={tour.image} style={styles.tourImage} />
-      <View style={styles.imageTotal}>
-      <Image source={tour.imageTotal.image1} style={styles.tourImageTotal} />
-      <Image source={tour.imageTotal.image2} style={styles.tourImageTotal} />
-      <Image source={tour.imageTotal.image3} style={styles.tourImageTotal} />
-      <Image source={tour.imageTotal.image4} style={styles.tourImageTotal} />
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Carousel ảnh */}
+        <View style={stylesLocal.carouselContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={images}
+            renderItem={renderImage}
+            keyExtractor={(item, index) => `image-${index}`}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={onScroll}
+            scrollEventThrottle={16}
+            contentContainerStyle={stylesLocal.carouselList}
+          />
+          {images.length > 1 && renderDots()}
+        </View>
 
-      </View>
-      <Text style={styles.tourTitle}>{tour.title}</Text>
+        {/* Tiêu đề tour */}
+        <Text style={styles.tourTitle}>{tour.tourName}</Text>
 
-
-      {/* <View style={styles.priceContainer}>
-        {tour.originalPrice && (
-        //  <Text style={styles.originalPrice}>
-            {tour.originalPrice} <Text style={styles.currency}>vnd</Text>
-          </Text>
-        )}
-        <Text style={styles.price}>
-          {tour.price} <Text style={styles.currency}>vnd</Text>
-        </Text>
-      </View>*/ }
-
-
-      {(tour.duration || tour.frequency || tour.transport || tour.hotel) && (
+        {/* Thông tin chi tiết */}
         <View style={styles.detailsContainer}>
           <View style={styles.sectionHeader}>
-
-            
+            <Text style={styles.sectionTitle}>Thông tin chuyến đi</Text>
           </View>
-          {tour.duration && (
-            <View style={styles.detailContainer}>
-              <Image
-                source={detailIcons.duration}
-           
-                style={styles.detailIcon}
-              />
-              <Text style={styles.cardDetail}>{tour.duration}</Text>
-            </View>
-          )}
-          {tour.frequency && (
-            <View style={styles.detailContainer}>
-              <Image
-                source={detailIcons.frequency}
-             
-                style={styles.detailIcon}
-              />
-              <Text style={styles.cardDetail}>{tour.frequency}</Text>
-            </View>
-          )}
-          {tour.transport && (
-            <View style={styles.detailContainer}>
-              <Image
-                source={detailIcons.transport}
-            
-                style={styles.detailIcon}
-              />
-              <Text style={styles.cardDetail}>{tour.transport}</Text>
-            </View>
-          )}
-          {tour.hotel && (
-            <View style={styles.detailContainer}>
-              <Image
-                source={detailIcons.hotel}
-              
-                style={styles.detailIcon}
-              />
-              <Text style={styles.cardDetail}>{tour.hotel}</Text>
-            </View>
-          )}
-        </View>)}
-        {tour.detailedInfo && tour.detailedInfo.descriptionPart1 && (
-        <View style={styles.detailedInfoContainer}>
-          <Text style={styles.sectionTitleHeader}>Chi tiết chuyến đi</Text>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Mô tả chuyến đi</Text>
+          <View style={styles.detailContainer}>
+            <FontAwesome5 name="clock" size={16} color="#3B82F6" />
+            <Text style={styles.cardDetail}>{tour.duration || '4 ngày 3 đêm'}</Text>
           </View>
-          <Text style={styles.description}>
-            {isExpanded
-              ? tour.detailedInfo.descriptionPart1
-              : getShortDescription(tour.detailedInfo.descriptionPart1)}
-          </Text>
-          {isExpanded && tour.detailedInfo.descriptionPart2 && (
-            <>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Lịch trình chuyến đi</Text>
-              </View>
-              <Text style={styles.description}>{tour.detailedInfo.descriptionPart2}</Text>
-            </>
-          )}
-          <TouchableOpacity
-            style={styles.toggleContainer}
-            onPress={() => setIsExpanded(!isExpanded)}
-          >
-            <Text style={styles.toggleText}>
-              {isExpanded ? 'Thu gọn' : 'Xem thêm'}
+          <View style={styles.detailContainer}>
+            <FontAwesome5 name="map-marked-alt" size={16} color="#10B981" />
+            <Text style={styles.cardDetail}>
+              Lịch trình: {tour.tourSchedule?.departureDate || 'Chưa có lịch'}
             </Text>
-          </TouchableOpacity>
+          </View>
+          <View style={styles.detailContainer}>
+            <FontAwesome5 name="bus" size={16} color="#EF4444" />
+            <Text style={styles.cardDetail}>Phương tiện: {tour.transportation || 'Máy bay'}</Text>
+          </View>
+          <View style={styles.detailContainer}>
+            <FontAwesome5 name="hotel" size={16} color="#F59E0B" />
+            <Text style={styles.cardDetail}>Chỗ ở: {tour.accommodation || 'Khách sạn'}</Text>
+          </View>
         </View>
-      )}
-    </ScrollView>
+
+        {/* Thông tin mô tả */}
+        <View style={styles.descriptionContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Thông tin mô tả</Text>
+          </View>
+          <Text style={styles.descriptionText}>
+            {tour.description || 'Chưa có mô tả'}
+          </Text>
+        </View>
+
+        {/* Lịch trình */}
+        <View style={styles.itineraryContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Lịch trình</Text>
+          </View>
+          {Array.isArray(tour.itinerary) && tour.itinerary.length > 0 ? (
+            tour.itinerary.map((item, index) => (
+              <Text key={index} style={styles.itineraryItem}>
+                {item}
+              </Text>
+            ))
+          ) : (
+            <Text style={styles.descriptionText}>Chưa có lịch trình</Text>
+          )}
+        </View>
+      </ScrollView>
+
+      {/* Booking Container cố định ở đáy */}
+      <View style={styles.bookingContainer}>
+        <View style={styles.priceContainer}>
+          <Text style={styles.price}>
+            {tour.newPrice && tour.discount > 0
+              ? `${tour.newPrice.toLocaleString()} VNĐ`
+              : `${tour.price.toLocaleString()} VNĐ`}
+          </Text>
+          {tour.newPrice && tour.discount > 0 && (
+            <Text style={styles.originalPrice}>
+              {tour.price.toLocaleString()} VNĐ
+            </Text>
+          )}
+        </View>
+        <TouchableOpacity style={styles.bookingButton}>
+          <Text style={styles.bookingButtonText}>Đặt tour</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
-
+const stylesLocal = StyleSheet.create({
+  carouselContainer: {
+    position: 'relative',
+    marginBottom: 16,
+  },
+  carouselImage: {
+    width: width,
+    height: 250,
+    borderRadius: 8,
+  },
+  carouselList: {
+    paddingHorizontal: 0,
+  },
+  dotsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 10,
+    width: '100%',
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: '#3B82F6',
+  },
+  inactiveDot: {
+    backgroundColor: '#D1D5DB',
+  },
+});
 
 export default TourDetails;

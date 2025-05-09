@@ -1,7 +1,17 @@
 # phoneMobileTravel
-# những thứ tôi mới cài (lỗi gì thì cài hộ)
+
 # @react-navigation/bottom-tabs
+
 # @react-navigation/stack
+
 # @react-navigation/native
 
-# run dự án thì k cần cài expo đâu chỉ cần chạy câu lệnh : npx expo start là nó sẽ chạy được
+# npm install axios @react-native-async-storage/async-storage
+
+# npm install jwt-decode
+
+# (bổ sung khi lỗi)
+
+# run dự án : npx expo start
+
+# Trong Api.js, Notification.js, TourApi.js thay 'http://192.168.1.9:8080' thành ipv4 trên máy các mom là được.

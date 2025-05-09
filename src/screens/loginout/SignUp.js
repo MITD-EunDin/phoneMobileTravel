@@ -1,30 +1,64 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { useAuth } from '../../contexts/AuthContext';
-import { COLORS } from '../../stysles/theme';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image } from 'react-native';
+import { registerCustomer, checkEmail, checkUsername } from '../../api/Api';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { COLORS } from '../../stysles/theme';
 
-const LoginScreen = ({ navigation }) => {
-  const { login } = useAuth();
+const SignUpScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleLogin = async () => {
-    if (!username || !password) {
+  const handleSignUp = async () => {
+    setError('');
+    setLoading(true);
+
+    if (!username || !email || !password || !confirmPassword) {
       setError('Vui lòng nhập đầy đủ thông tin');
+      setLoading(false);
       return;
     }
 
-    setLoading(true);
-    setError('');
+    if (password !== confirmPassword) {
+      setError('Mật khẩu xác nhận không khớp!');
+      setLoading(false);
+      return;
+    }
+
+    if (!email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
+      setError('Định dạng email không hợp lệ!');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const success = await login(username, password);
-      if (!success) {
-        setError('Tên đăng nhập hoặc mật khẩu không đúng.');
+      const [usernameExists, emailExists] = await Promise.all([
+        checkUsername(username),
+        checkEmail(email),
+      ]);
+      if (usernameExists) {
+        setError('Tên tài khoản đã tồn tại!');
+        setLoading(false);
+        return;
+      }
+      if (emailExists) {
+        setError('Email đã được sử dụng!');
+        setLoading(false);
+        return;
+      }
+
+      const userData = { username, email, password };
+      const result = await registerCustomer(userData);
+      if (result && result.id) {
+        Alert.alert('Thành công', 'Đăng ký thành công! Vui lòng đăng nhập.');
+        navigation.navigate('Login');
+      } else {
+        setError('Đăng ký thất bại.');
       }
     } catch (err) {
       setError(err.message);
@@ -36,7 +70,7 @@ const LoginScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image source={require('../../img/logoDTC.png')} style={styles.logo} />
-      <Text style={styles.title}>Đăng nhập</Text>
+      <Text style={styles.title}>Đăng ký</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <View style={styles.inputContainer}>
@@ -46,6 +80,18 @@ const LoginScreen = ({ navigation }) => {
           placeholderTextColor={COLORS.gray}
           value={username}
           onChangeText={setUsername}
+          autoCapitalize="none"
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor={COLORS.gray}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
           autoCapitalize="none"
         />
       </View>
@@ -71,17 +117,38 @@ const LoginScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Xác nhận mật khẩu"
+          placeholderTextColor={COLORS.gray}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry={!showConfirmPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+        >
+          <Icon
+            name={showConfirmPassword ? 'eye' : 'eye-slash'}
+            size={20}
+            color={COLORS.gray}
+          />
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity
         style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={handleLogin}
+        onPress={handleSignUp}
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          {loading ? 'Đang đăng ký...' : 'Đăng ký'}
         </Text>
       </TouchableOpacity>
 
-      <Text style={styles.socialText}>Hoặc đăng nhập với</Text>
+      <Text style={styles.socialText}>Hoặc đăng ký với</Text>
       <View style={styles.socialContainer}>
         <TouchableOpacity style={styles.socialButton}>
           <Icon name="facebook" size={30} color={COLORS.blue} />
@@ -92,9 +159,9 @@ const LoginScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Chưa có tài khoản? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.footerLink}>Đăng ký</Text>
+        <Text style={styles.footerText}>Đã có tài khoản? </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.footerLink}>Đăng nhập</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -202,4 +269,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default SignUpScreen;

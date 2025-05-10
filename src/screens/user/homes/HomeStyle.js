@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-
+import {COLORS} from '../../../stysles/theme'
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#EB6A58',
+    color: COLORS.lightRed,
     marginBottom: 10,
   },
   detailContainer:{
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   cardDetail: {
     fontSize: 12,
     color: '#666',
-    paddingHorizontal: 10,
+    // paddingHorizontal: 10,
     marginBottom: 5,
   },
   cardPrice: {

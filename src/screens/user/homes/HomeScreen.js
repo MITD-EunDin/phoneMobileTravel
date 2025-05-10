@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useContext } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, ImageBackground, Animated, StyleSheet } from 'react-native';
 import { ToursContext } from '../../../contexts/ToursContext';
+import { FontAwesome5 } from '@expo/vector-icons';
+import {COLORS} from '../../../stysles/theme'
 import styles from './HomeStyle';
 
 const filters = [
@@ -105,13 +107,16 @@ const HomeScreen = ({ navigation }) => {
                                     <Text style={stylesLocal.tourName}>{item.tourName}</Text>
                                     <Text style={stylesLocal.tourType}>{item.tourType}</Text>
                                     <View style={stylesLocal.detailsContainer}>
+                                        <View style={styles.detailContainer}>
+                                            <Text style={styles.cardDetail}>{item.duration || ''}</Text>
+                                        </View>
                                         <Text style={stylesLocal.infoText}>
                                             {item.tourSchedule?.departureDate || 'Chưa có lịch'}
                                         </Text>
+                                    </View>
                                         <Text style={stylesLocal.price}>
                                             {item.newPrice ? item.newPrice.toLocaleString() : item.price.toLocaleString()} VNĐ
                                         </Text>
-                                    </View>
                                 </TouchableOpacity>
                             )}
                             keyExtractor={(item) => item.tourId}
@@ -151,6 +156,9 @@ const HomeScreen = ({ navigation }) => {
                                     <Text style={stylesLocal.tourName}>{item.tourName}</Text>
                                     <Text style={stylesLocal.tourType}>{item.tourType}</Text>
                                     <View style={stylesLocal.detailsContainer}>
+                                        <View style={styles.detailContainer}>
+                                            <Text style={styles.cardDetail}>{item.duration || ''}</Text>
+                                        </View>
                                         <Text style={stylesLocal.infoText}>
                                             {item.tourSchedule?.departureDate || 'Chưa có lịch'}
                                         </Text>
@@ -207,12 +215,12 @@ const stylesLocal = StyleSheet.create({
     },
     viewMore: {
         fontSize: 16,
-        color: '#3B82F6',
+        color: COLORS.primary,
         fontWeight: '600',
     },
     tourCard: {
         width: 200,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.white,
         borderRadius: 8,
         padding: 12,
         marginRight: 16,
@@ -231,30 +239,28 @@ const stylesLocal = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         marginTop: 8,
-        color: '#1F2937',
+        color: COLORS.black,
     },
     tourType: {
         fontSize: 12,
-        color: '#6B7280',
+        color: COLORS.gray,
         marginBottom: 8,
     },
     detailsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: 'column', 
     },
     infoText: {
         fontSize: 12,
-        color: '#4B5563',
+        color: COLORS.gray,
     },
     price: {
         fontSize: 14,
         fontWeight: '700',
-        color: '#EF4444',
+        color: COLORS.red,
     },
     oldPrice: {
         fontSize: 12,
-        color: '#6B7280',
+        color: COLORS.gray,
         textDecorationLine: 'line-through',
     },
 });

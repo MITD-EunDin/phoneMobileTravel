@@ -124,6 +124,7 @@ const TourDetails = ({ route }) => {
       {/* Booking Container cố định ở đáy */}
       <View style={styles.bookingContainer}>
         <View style={styles.priceContainer}>
+          <Text style={styles.describeText}>Chỉ từ:</Text>
           <Text style={styles.price}>
             {tour.newPrice && tour.discount > 0
               ? `${tour.newPrice.toLocaleString()} VNĐ`

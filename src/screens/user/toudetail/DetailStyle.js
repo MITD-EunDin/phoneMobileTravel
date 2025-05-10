@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
-
+import { COLORS } from '../../../stysles/theme';
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#f0f4f8',
@@ -17,38 +17,41 @@ const styles = StyleSheet.create({
   tourTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#1F2937',
+    color: COLORS.black,
     marginBottom: 10,
   },
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  describeText: {
+    color: COLORS.black,
+  },
   originalPrice: {
-    fontSize: 16,
-    color: '#6B7280',
+    fontSize: 10,
+    color: COLORS.gray,
     textDecorationLine: 'line-through',
     marginRight: 10,
   },
   price: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '700',
-    color: '#EF4444',
+    color: COLORS.red,
   },
   detailsContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
   },
   descriptionContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
   },
   itineraryContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
@@ -64,7 +67,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1F2937',
+    color: COLORS.black,
   },
   detailContainer: {
     flexDirection: 'row',
@@ -73,17 +76,17 @@ const styles = StyleSheet.create({
   },
   cardDetail: {
     fontSize: 14,
-    color: '#4B5563',
+    color: COLORS.gray,
     marginLeft: 10,
   },
   descriptionText: {
     fontSize: 14,
-    color: '#4B5563',
+    color: COLORS.gray,
     lineHeight: 22,
   },
   itineraryItem: {
     fontSize: 14,
-    color: '#4B5563',
+    color: COLORS.gray,
     marginBottom: 8,
     paddingLeft: 10,
   },
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     paddingVertical: 12,
     paddingHorizontal: 16,
     flexDirection: 'row',
@@ -113,7 +116,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   bookingButtonText: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',

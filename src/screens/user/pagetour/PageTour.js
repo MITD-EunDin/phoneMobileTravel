@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { ToursContext } from '../../../contexts/ToursContext';
+import { COLORS } from '../../../stysles/theme';
 
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/png?text=Image+Not+Found';
 
@@ -24,11 +25,14 @@ const PageTour = ({ route, navigation }) => {
         resizeMode="cover"
         onError={(e) => console.warn(`Lỗi tải ảnh tour ${item.tourName}:`, e.nativeEvent.error)}
       />
-      <Text style={styles.tourName} numberOfLines={1} ellipsizeMode="tail">
+      <Text style={styles.tourName} numberOfLines={2} ellipsizeMode="tail">
         {item.tourName}
       </Text>
       <Text style={styles.tourType}>{item.tourType}</Text>
       <View style={styles.detailsContainer}>
+        <View>
+            <Text style={styles.cardDetail}>{item.duration || ''}</Text>
+        </View>
         <Text style={styles.infoText}>
           {item.tourSchedule?.departureDate || 'Chưa có lịch'}
         </Text>
@@ -70,7 +74,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1F2937',
+    color: COLORS.black,
     marginBottom: 16,
   },
   columnWrapper: {
@@ -101,31 +105,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginTop: 8,
-    color: '#1F2937',
+    color: COLORS.black,
     flexShrink: 1,
   },
   tourType: {
     fontSize: 12,
-    color: '#6B7280',
+    color: COLORS.gray,
     marginBottom: 8,
   },
   detailsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: 'columns',
   },
   infoText: {
     fontSize: 12,
-    color: '#4B5563',
+    color: COLORS.gray,
+  },
+  cardDetail: {
+    fontSize: 12,
+    color: COLORS.gray,
   },
   price: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#EF4444',
+    color: COLORS.red,
   },
   oldPrice: {
     fontSize: 12,
-    color: '#6B7280',
+    color: COLORS.gray,
     textDecorationLine: 'line-through',
   },
 });

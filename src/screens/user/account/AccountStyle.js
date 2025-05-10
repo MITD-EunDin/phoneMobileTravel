@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 50,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderRadius: 8,
     paddingHorizontal: 15,
     fontSize: 16,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.grayLight,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   confirmPasswordText: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   saveButtonText: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   logoutButtonText: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: 'bold',
   },

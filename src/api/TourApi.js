@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const BASE_URL = 'http://10.0.0.111:8080/tours';
+const BASE_URL = 'http://localhost:8080/tours';
 
 const getAuthHeaders = async () => {
   try {

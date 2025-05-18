@@ -1,13 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { X, Mail, MailOpen, Plus } from "lucide-react";
-import {
-  getNotifications,
-  getAllNotifications,
-  markNotificationAsRead,
-  connectWebSocket,
-  createDiscountNotification,
-} from "../../api/Notification";
-import styles from "./NotificationManagement.module.css";
+import { X, Mail, MailOpen, Plus } from "lucide-react-native";
+import {getNotifications,getAllNotifications,markNotificationAsRead,connectWebSocket,createDiscountNotification} from "../../../api/Notification";
+import styles from "./NoticeStyle";
 
 const generateUniqueId = () => {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);

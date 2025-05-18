@@ -1,103 +1,106 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, Image } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, FlatList, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import styles from './ManageTourStysle';
 import { BadgePlus, ChevronRight } from 'lucide-react-native';
-import AddTour from "../addtour/AddTour";
+import { ToursContext } from '../../../contexts/ToursContext';
 import { COLORS } from '../../../stysles/theme';
+
 const ManageTour = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { tours } = useContext(ToursContext);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const tours = [
-    {
-      id: '1',
-      code: 'Tour-1',
-      image: require("../../../img/tour.png"),
-      tourName: 'Sapa–Lào Cai 4 ngày 3 đêm',
-      price: '5.000.000 đ',
-  },
-  {
-      id: '2',
-      code: 'Tour-2',
-      image: require("../../../img/halong.png"),
-      tourName: 'Hà Nội - Hạ Long 3 ngày 2 đêm',
-      price: '4.500.000 đ',
-  },
-  {
-      id: '3',
-      code: 'Tour-3',
-      image: require("../../../img/hoian.png"),
-      tourName: 'Đà Nẵng - Hội An 4 ngày 3 đêm',
-      price: '6.000.000 đ',
-  },
-  {
-      id: '4',
-      code: 'Tour-4',
-      image: require("../../../img/phuquoc.png"),
-      tourName: 'Phú Quốc - Thiên đường biển',
-      price: '7.000.000 đ',
-  },
-  {
-      id: '5',
-      code: 'Tour-5',
-      image: require("../../../img/mientay.png"),
-      tourName: 'Sài Gòn - Miền Tây sông nước',
-      price: '5.500.000 đ',
-  },
-  ];
+  // Dừng loading sau khi tours được cập nhật
+  React.useEffect(() => {
+    if (tours.length > 0 || tours.length === 0) {
+      setLoading(false);
+    }
+  }, [tours]);
 
   // Lọc tour dựa trên tìm kiếm
   const filteredTours = tours.filter(
     (tour) =>
-        tour.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tour.tourName.toLowerCase().includes(searchQuery.toLowerCase())
-);
+      tour.code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tour.tourName?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-const renderTour = ({ item }) => (
+  // Định dạng giá tiền
+  const formatPrice = (price) => {
+    if (typeof price === 'number') {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+      }).format(price);
+    }
+    return price || 'N/A';
+  };
+
+  const renderTour = ({ item }) => (
     <TouchableOpacity
-        style={styles.tourCard}
-        onPress={() => navigation.navigate('TourDetail', { tourId: item.id })}
-        activeOpacity={0.7}
+      style={styles.tourCard}
+      onPress={() => navigation.navigate('TourDetail', { tourId: item.id })}
+      activeOpacity={0.7}
     >
-        <View style={styles.tourDetails}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={styles.tourCode}>{item.code}</Text>
-                <View style={{ flexDirection: 'row' }}>
-                    <Text style={{ color: COLORS.blue }}>Chi tiết</Text>
-                    <ChevronRight color={COLORS.blue} size={20} />
-                </View>
-            </View>
-            <View style={styles.tourInfoContainer}>
-                <Image source={item.image} style={styles.tourImage} />
-                <View>
-                  <Text style={styles.tourName}>{item.tourName}</Text>
-                  <Text style={styles.price}>{item.price}</Text>
-                </View>
-            </View>
+      <View style={styles.tourDetails}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={styles.tourCode}>{item.code || 'N/A'}</Text>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ color: COLORS.blue }}>Chi tiết</Text>
+            <ChevronRight color={COLORS.blue} size={20} />
+          </View>
         </View>
+        <View style={styles.tourInfoContainer}>
+          {item.image ? (
+            <Image source={{ uri: item.image }} style={styles.tourImage} />
+          ) : (
+            <View style={[styles.tourImage, { backgroundColor: '#ccc' }]} />
+          )}
+          <View>
+            <Text style={styles.tourName}>{item.tourName || 'Không có tên'}</Text>
+            <Text style={styles.price}>{formatPrice(item.price)}</Text>
+          </View>
+        </View>
+      </View>
     </TouchableOpacity>
-);
+  );
 
-return (
+  return (
     <View style={styles.container}>
-        {/* Thanh tìm kiếm */}
-        <TextInput
-            style={styles.searchInput}
-            placeholder="Mã đơn hàng/Tên tour"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            returnKeyType="done"
-        />
+      {/* Thanh tìm kiếm */}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Mã đơn hàng/Tên tour"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        returnKeyType="done"
+      />
 
-        {/* Danh sách tour */}
-        <View style={styles.contentCart}>
-            <FlatList
-                data={filteredTours}
-                renderItem={renderTour}
-                keyExtractor={(item) => item.id}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.tourList}
-            />
-        </View>
+      {/* Hiển thị trạng thái */}
+      <View style={styles.contentCart}>
+        {loading ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={COLORS.blue} />
+            <Text>Đang tải danh sách tour...</Text>
+          </View>
+        ) : error ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ color: 'red' }}>Lỗi: {error}</Text>
+          </View>
+        ) : filteredTours.length === 0 ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text>Không tìm thấy tour nào</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredTours}
+            renderItem={renderTour}
+            keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.tourList}
+          />
+        )}
+      </View>
 
       {/* Nút thêm tour */}
       <TouchableOpacity

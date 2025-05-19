@@ -21,7 +21,7 @@ const AppNavigator = () => {
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{ headerShown: false }}
-          initialRouteName={user ? (user.roles?.includes("ADMIN") || user.roles?.includes("ROLE_ADMIN") ? "Admin" : "Customer") : "Login"}
+          initialRouteName={user ? (user.roles?.includes("ADMIN") || user.roles?.includes("ROLE_ADMIN") ? "ADMIN" : "USER") : "Login"}
         >
           {!user ? (
             <>
@@ -38,13 +38,13 @@ const AppNavigator = () => {
             </>
           ) : user.roles?.includes("ADMIN") || user.roles?.includes("ROLE_ADMIN") ? (
             <Stack.Screen
-              name="Admin"
+              name="ADMIN"
               component={AdminNavigator}
               options={{ gestureEnabled: false }}
             />
           ) : (
             <Stack.Screen
-              name="Customer"
+              name="USER"
               component={CustomerNavigator}
               options={{ gestureEnabled: false }}
             />

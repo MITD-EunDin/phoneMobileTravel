@@ -59,3 +59,12 @@ export const filterInternationalTours = (allTours) =>
 
 export const filterDiscountTours = (allTours) =>
     allTours.filter((tour) => tour.discount > 0);
+
+export const filterPopular = (allTours) =>
+    allTours.filter((tour) => tour.discount === 0 || tour.discount < 0 );
+
+export const filterRegion = (allTours) => 
+    allTours.filter((tour) => tour.region?.toLowerCase() === region.toLowerCase());
+
+export const filterDuration = (allTours) =>
+    allTours.filter((tour) => tour.duration?.toLowerCase() === duration.toLowerCase());

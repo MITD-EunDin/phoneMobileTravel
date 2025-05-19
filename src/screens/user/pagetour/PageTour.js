@@ -2,17 +2,39 @@ import React, { useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { ToursContext } from '../../../contexts/ToursContext';
 import { COLORS } from '../../../stysles/theme';
-
+import { filterPopular, filterDiscountTours, filterRegion, filterDuration, filterDomesticTours, filterInternationalTours } from '../../../contexts/ToursContext';
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/png?text=Image+Not+Found';
 
 const PageTour = ({ route, navigation }) => {
   const { type } = route.params; // 'popular' hoặc 'discounted'
+  const { filterType, value } = route.params || {};
   const { tours = [] } = useContext(ToursContext);
 
   // Lọc tour dựa trên type
-  const filteredTours = type === 'popular'
-    ? tours.filter(tour => !tour.newPrice || tour.discount <= 0)
-    : tours.filter(tour => tour.newPrice && tour.discount > 0);
+  // const filteredTours = type === 'popular'
+  //   ? tours.filter(tour => !tour.newPrice || tour.discount <= 0)
+  //   : tours.filter(tour => tour.newPrice && tour.discount > 0);
+
+  let filteredTours = tours;
+    switch (filter) {
+        case 'popular':
+            filteredTours = filterPopular(tours);
+            break;
+        case 'discounted':
+            filteredTours = filterDiscountTours(tours);
+            break;
+        case 'region':
+            filteredTours = filterRegion(tours, value);
+            break;
+        case 'tourType':
+            filteredTours = value === 'domestic' ? filterDomesticTours(tours) : filterInternationalTours(tours);
+            break;
+        case 'duration':
+            filteredTours = filterDuration(tours, value);
+            break;
+        default:
+            filteredTours = tours;
+    }
 
   const renderTourItem = ({ item }) => (
     <TouchableOpacity

@@ -37,34 +37,20 @@ const SignUpScreen = ({ navigation }) => {
     }
 
     try {
-      const [usernameExists, emailExists] = await Promise.all([
-        checkUsername(username),
-        checkEmail(email),
-      ]);
-      if (usernameExists) {
-        setError('Tên tài khoản đã tồn tại!');
+            const userData = { username, email, password };
+            const result = await registerCustomer(userData);
+            console.log("Kết quả từ API:", result);
+            if (result && result.id) {
+                alert("Đăng ký thành công!");
+                navigation.navigate('Login');
+            } else {
+                setError(result.message || "Đăng ký thất bại, vui lòng thử lại!");
+            }
+        } catch (error) {
+            console.error("Lỗi đăng ký:", error);
+            setError("Đã xảy ra lỗi, vui lòng thử lại sau.");
+        }
         setLoading(false);
-        return;
-      }
-      if (emailExists) {
-        setError('Email đã được sử dụng!');
-        setLoading(false);
-        return;
-      }
-
-      const userData = { username, email, password };
-      const result = await registerCustomer(userData);
-      if (result && result.id) {
-        Alert.alert('Thành công', 'Đăng ký thành công! Vui lòng đăng nhập.');
-        navigation.navigate('Login');
-      } else {
-        setError('Đăng ký thất bại.');
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (

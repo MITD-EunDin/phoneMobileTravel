@@ -6,7 +6,7 @@ import TourScreen from '../screens/user/tour/TourScreen';
 import AccountScreen from '../screens/user/account/AccountScreen';
 import OrderScreen from '../screens/user/order/OrderScreen';
 import TourDetails from '../screens/user/toudetail/TourDetail';
-import TourListScreen from '../screens/user/pagetour/PageTour';
+import PageTour from '../screens/user/pagetour/PageTour';
 import CommonHeader from '../components/CommonHeader';
 import TopBar from '../components/Top/TopBar';
 import Notice from '../screens/user/notice/Notice';
@@ -83,8 +83,8 @@ const CustomerNavigator = ({ onLogout }) => {
                 }}
             />
             <Stack.Screen
-                name="TourListScreen"
-                component={TourListScreen}
+                name="PageTour"
+                component={PageTour}
                 options={{
                     header: (props) => <CommonHeader {...props} title="Danh Sách Tour" />,
                     headerShown: true,

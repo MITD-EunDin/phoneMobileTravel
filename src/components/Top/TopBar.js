@@ -9,6 +9,7 @@ import { getNotifications } from '../../api/Notification';
 const TopBar = ({ navigation }) => {
   const [hasNotifications, setHasNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Lấy thông báo để kiểm tra số thông báo chưa đọc
   useEffect(() => {
@@ -28,13 +29,26 @@ const TopBar = ({ navigation }) => {
     fetchNotifications();
   }, []);
 
+  // Xử lý tìm kiếm khi nhấn "done"
+    const handleSearch = () => {
+        if (searchQuery.trim()) {
+            navigation.navigate('PageTour', {
+                filterType: 'search',
+                value: searchQuery.trim(),
+            });
+            setSearchQuery(''); // Xóa input sau khi tìm kiếm
+        }
+    };
+
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.searchInput}
         placeholder="Tìm kiếm..."
+        rvalue={searchQuery}
+        onChangeText={setSearchQuery}
         returnKeyType="done"
-        onSubmitEditing={() => {}}
+        onSubmitEditing={handleSearch}
       />
       <TouchableOpacity
         style={styles.notification}

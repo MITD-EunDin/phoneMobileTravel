@@ -4,16 +4,17 @@ import { ToursContext } from '../../../contexts/ToursContext';
 import { FontAwesome5 } from '@expo/vector-icons';
 import {COLORS} from '../../../stysles/theme'
 import styles from './HomeStyle';
+import { filterDiscountTours, filterPopular, filterRegion, filterDuration, filterDomesticTours, filterInternationalTours } from '../../../contexts/ToursContext';
 
 const filters = [
     'Miền bắc',
     'Miền trung',
     'Miền nam',
-    'Tour ưu đãi',
+    'Trong nước',
     'Ngoài nước',
-    '5N4D',
-    '4N3D',
-    '3N2D',
+    '5 Ngày 4 Đêm',
+    '4 Ngày 3 Đêm',
+    '3 Ngày 2 Đêm',
 ];
 
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/png?text=Image+Not+Found';
@@ -34,8 +35,8 @@ const HomeScreen = ({ navigation }) => {
     }, []);
 
     // Lọc tour phổ biến (không giảm giá) và tour ưu đãi (có giảm giá)
-    const popularTrips = tours.filter(tour => !tour.newPrice || tour.discount <= 0).slice(0, 4);
-    const discountedTrips = tours.filter(tour => tour.newPrice && tour.discount > 0).slice(0, 4);
+    const popularTrips = filterPopular(tours).slice(0, 4);
+    const discountedTrips = filterDiscountTours(tours).slice(0, 4);
 
     const renderFilters = ({ item }) => (
         <TouchableOpacity
@@ -46,9 +47,38 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
     );
 
-    const handleFilterPress = (filter) => {
-        console.log(`Lọc theo: ${filter}`);
-        // Có thể tích hợp với filterTours API nếu cần
+ const handleFilterPress = (filter) => {
+        let filterParams = {};
+        switch (filter) {
+            // case 'Miền bắc':
+            //     filterParams = { filterType: 'region', value: 'north' };
+            //     break;
+            // case 'Miền trung':
+            //     filterParams = { filterType: 'region', value: 'central' };
+            //     break;
+            // case 'Miền nam':
+            //     filterParams = { filterType: 'region', value: 'south' };
+            //     break;
+            case 'Trong nước':
+                filterParams = { filterType: 'tourType', value: 'domestic' };
+                break;
+            case 'Ngoài nước':
+                filterParams = { filterType: 'tourType', value: 'international' };
+                break;
+            // case '5 Ngày 4 Đêm':
+            //     filterParams = { filterType: 'duration', value: '5N4D' };
+            //     break;
+            // case '4 Ngày 3 Đêm':
+            //     filterParams = { filterType: 'duration', value: '4N3D' };
+            //     break;
+            // case '3 Ngày 2 Đêm':
+            //     filterParams = { filterType: 'duration', value: '3N2D' };
+            //     break;
+            default:
+                filterParams = { filterType: 'all' };
+        }
+        // console.log(`Lọc theo: ${filter}`, filterParams);
+        navigation.navigate('PageTour', filterParams);
     };
 
     const renderSection = ({ item }) => {
@@ -86,7 +116,7 @@ const HomeScreen = ({ navigation }) => {
                         <View style={stylesLocal.sectionHeader}>
                             <Text style={styles.sectionTitle}>Phổ biến</Text>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('TourListScreen', { type: 'popular' })}
+                                onPress={() => navigation.navigate('PageTour', { type: 'popular' })}
                             >
                                 <Text style={stylesLocal.viewMore}>Xem Thêm</Text>
                             </TouchableOpacity>
@@ -135,7 +165,7 @@ const HomeScreen = ({ navigation }) => {
                         <View style={stylesLocal.sectionHeader}>
                             <Text style={styles.sectionTitle}>Ưu đãi giảm giá</Text>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('TourListScreen', { type: 'discounted' })}
+                                onPress={() => navigation.navigate('PageTour', { type: 'discounted' })}
                             >
                                 <Text style={stylesLocal.viewMore}>Xem Thêm</Text>
                             </TouchableOpacity>

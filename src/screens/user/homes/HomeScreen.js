@@ -2,9 +2,9 @@ import React, { useRef, useEffect, useContext } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, ImageBackground, Animated, StyleSheet } from 'react-native';
 import { ToursContext } from '../../../contexts/ToursContext';
 import { FontAwesome5 } from '@expo/vector-icons';
-import {COLORS} from '../../../stysles/theme'
+import { COLORS } from '../../../stysles/theme'
 import styles from './HomeStyle';
-import { filterDiscountTours, filterPopular, filterRegion, filterDuration, filterDomesticTours, filterInternationalTours } from '../../../contexts/ToursContext';
+import { filterDiscountTours, filterPopular } from '../../../contexts/ToursContext';
 
 const filters = [
     'Miền bắc',
@@ -20,8 +20,7 @@ const filters = [
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/png?text=Image+Not+Found';
 
 const HomeScreen = ({ navigation }) => {
-    const context = useContext(ToursContext);
-    const tours = context?.tours || [];
+    const { tours = [] } = useContext(ToursContext);
     const airplaneAnim = useRef(new Animated.Value(-300)).current;
 
     useEffect(() => {
@@ -35,8 +34,8 @@ const HomeScreen = ({ navigation }) => {
     }, []);
 
     // Lọc tour phổ biến (không giảm giá) và tour ưu đãi (có giảm giá)
-    const popularTrips = filterPopular(tours).slice(0, 4);
-    const discountedTrips = filterDiscountTours(tours).slice(0, 4);
+    const popularTrips = filterPopular(tours).slice(0, 6);
+    const discountedTrips = filterDiscountTours(tours).slice(0, 6);
 
     const renderFilters = ({ item }) => (
         <TouchableOpacity
@@ -47,37 +46,36 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
     );
 
- const handleFilterPress = (filter) => {
+    const handleFilterPress = (filter) => {
         let filterParams = {};
-        switch (filter) {
-            // case 'Miền bắc':
-            //     filterParams = { filterType: 'region', value: 'north' };
-            //     break;
-            // case 'Miền trung':
-            //     filterParams = { filterType: 'region', value: 'central' };
-            //     break;
-            // case 'Miền nam':
-            //     filterParams = { filterType: 'region', value: 'south' };
-            //     break;
-            case 'Trong nước':
+        switch (filter.toLowerCase()) {
+            case 'miền bắc':
+                filterParams = { filterType: 'region', value: 'Miền Bắc' };
+                break;
+            case 'miền trung':
+                filterParams = { filterType: 'region', value: 'Miền Trung' };
+                break;
+            case 'miền nam':
+                filterParams = { filterType: 'region', value: 'Miền Nam' };
+                break;
+            case 'trong nước':
                 filterParams = { filterType: 'tourType', value: 'domestic' };
                 break;
-            case 'Ngoài nước':
+            case 'ngoài nước':
                 filterParams = { filterType: 'tourType', value: 'international' };
                 break;
-            // case '5 Ngày 4 Đêm':
-            //     filterParams = { filterType: 'duration', value: '5N4D' };
-            //     break;
-            // case '4 Ngày 3 Đêm':
-            //     filterParams = { filterType: 'duration', value: '4N3D' };
-            //     break;
-            // case '3 Ngày 2 Đêm':
-            //     filterParams = { filterType: 'duration', value: '3N2D' };
-            //     break;
+            case '5 ngày 4 đêm':
+                filterParams = { filterType: 'duration', value: '5 ngày 4 đêm' };
+                break;
+            case '4 ngày 3 đêm':
+                filterParams = { filterType: 'duration', value: '4 ngày 3 đêm' };
+                break;
+            case '3 ngày 2 đêm':
+                filterParams = { filterType: 'duration', value: '3 ngày 2 đêm' };
+                break;
             default:
                 filterParams = { filterType: 'all' };
         }
-        // console.log(`Lọc theo: ${filter}`, filterParams);
         navigation.navigate('PageTour', filterParams);
     };
 
@@ -132,24 +130,33 @@ const HomeScreen = ({ navigation }) => {
                                         source={{ uri: item.image || PLACEHOLDER_IMAGE }}
                                         style={stylesLocal.tourImage}
                                         resizeMode="cover"
-                                        onError={(e) => console.warn(`Lỗi tải ảnh tour ${item.tourName}:`, e.nativeEvent.error)}
+                                        onError={(e) => {
+                                            if (__DEV__) {
+                                                console.warn(`Lỗi tải ảnh tour ${item.tourName || 'Không tên'}:`, e.nativeEvent.error);
+                                            }
+                                        }}
                                     />
-                                    <Text style={stylesLocal.tourName}>{item.tourName}</Text>
-                                    <Text style={stylesLocal.tourType}>{item.tourType}</Text>
+                                    <Text style={stylesLocal.tourName}>{item.tourName || 'Không tên'}</Text>
+                                    <Text style={stylesLocal.tourType}>{item.tourType || 'Không xác định'}</Text>
                                     <View style={stylesLocal.detailsContainer}>
-                                        <View style={styles.detailContainer}>
-                                            <Text style={styles.cardDetail}>{item.duration || ''}</Text>
-                                        </View>
+                                        <Text style={styles.cardDetail}>{item.duration || 'Chưa có'}</Text>
                                         <Text style={stylesLocal.infoText}>
                                             {item.tourSchedule?.departureDate || 'Chưa có lịch'}
                                         </Text>
+                                        <View>
+                                            {item.newPrice && item.discount > 0 && (
+                                                <Text style={stylesLocal.oldPrice}>
+                                                    {(item.price || 0).toLocaleString()} VNĐ
+                                                </Text>
+                                            )}
+                                            <Text style={stylesLocal.price}>
+                                                {(item.newPrice && item.discount > 0 ? item.newPrice : item.price || 0).toLocaleString()} VNĐ
+                                            </Text>
+                                        </View>
                                     </View>
-                                        <Text style={stylesLocal.price}>
-                                            {item.newPrice ? item.newPrice.toLocaleString() : item.price.toLocaleString()} VNĐ
-                                        </Text>
                                 </TouchableOpacity>
                             )}
-                            keyExtractor={(item) => item.tourId}
+                            keyExtractor={(item) => item.tourId?.toString() || `tour-${Math.random()}`}
                             horizontal
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={styles.flatList}
@@ -277,7 +284,7 @@ const stylesLocal = StyleSheet.create({
         marginBottom: 8,
     },
     detailsContainer: {
-        flexDirection: 'column', 
+        flexDirection: 'column',
     },
     infoText: {
         fontSize: 12,

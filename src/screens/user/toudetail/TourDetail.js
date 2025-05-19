@@ -1,15 +1,20 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, Image, FlatList, ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, Image, FlatList, ScrollView, StyleSheet, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import styles from './DetailStyle';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/600x400.png?text=Image+Not+Available';
 
 const TourDetails = ({ route }) => {
+  const navigation = useNavigation();
+
   const { tour } = route.params;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const flatListRef = useRef(null);
+
+  console.log("tour :", tour);
 
   // Lấy danh sách ảnh từ tour.images hoặc dùng image làm fallback
   const images = tour.images && tour.images.length > 0 ? tour.images : [tour.image || PLACEHOLDER_IMAGE];
@@ -136,7 +141,31 @@ const TourDetails = ({ route }) => {
             </Text>
           )}
         </View>
-        <TouchableOpacity style={styles.bookingButton}>
+        <TouchableOpacity
+          style={styles.bookingButton}
+          onPress={() => {
+            Alert.alert(
+              'Xác nhận đặt tour',
+              `Bạn có muốn đặt tour ${tour.tourName} với giá ${tour.newPrice.toLocaleString()} VNĐ?`,
+              [
+                { text: 'Hủy', style: 'cancel' },
+                {
+                  text: 'Đặt',
+                  onPress: () => navigation.navigate('Booking', {
+                    tourId: tour.tourId,
+                    tourName: tour.tourName,
+                    price: tour.newPrice,
+                    duration: tour.duration,
+                    transportation: tour.transportation,
+                    accommodation: tour.accommodation,
+                    firstImage: tour.images[0],
+                    departureDate: tour.tourSchedules?.[0]?.departureDate || 'Chưa có lịch'
+                  }),
+                },
+              ]
+            );
+          }}
+        >
           <Text style={styles.bookingButtonText}>Đặt tour</Text>
         </TouchableOpacity>
       </View>

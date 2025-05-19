@@ -35,7 +35,7 @@ const getUserIdFromToken = (token) => {
 
 // Hàm chuyển đổi dữ liệu từ backend
 const mapNotification = (notification) => {
-  console.log('Mapping notification:', notification);
+
   return {
     id: notification.id || generateUniqueId(),
     backendId: notification.id,

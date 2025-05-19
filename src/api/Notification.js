@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Địa chỉ base URL của backend
-const API_URL = 'http://192.168.53.232:8080';
+const API_URL = 'http://192.168.0.106:8080';
 
 // Tạo instance của axios với cấu hình mặc định
 const api = axios.create({
@@ -21,7 +21,7 @@ export const getNotifications = async (token) => {
         const response = await api.get('/notifications/history', {
             headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Notifications response:', response.data);
+        // console.log('Notifications response:', response.data);
         return response.data.result;
     } catch (error) {
         console.error('Error fetching notifications:', error.response?.data || error.message);

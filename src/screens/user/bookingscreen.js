@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../stysles/theme';
+import { bookTour } from '../../api/BookingApi';
 
 const BookingScreen = ({ route }) => {
-    const { tourId, tourName = 'Không có tên tour', price, duration, transportation, accommodation, firstImage, departureDate } = route.params || {};
+    const { tourId, tourName = 'Không có tên tour', price, duration, transportation, accommodation, firstImage, departureDate, tourScheduleId } = route.params || {};
     const navigation = useNavigation();
 
     const [fullName, setFullName] = useState('');
@@ -22,7 +23,7 @@ const BookingScreen = ({ route }) => {
     const totalAmount = (parseInt(adults || 0) * adultPrice) + (parseInt(children || 0) * childPrice);
     const totalPeople = (parseInt(adults || 0) + parseInt(children || 0)); // Tổng số người
 
-    const handleBookTour = () => {
+    const handleBookTour = async () => {
         if (!fullName.trim() || !phone.trim() || !email.trim() || !citizen.trim() || !address.trim()) {
             Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin.');
             return;
@@ -39,32 +40,35 @@ const BookingScreen = ({ route }) => {
             Alert.alert('Lỗi', 'Số điện thoại phải là số.');
             return;
         }
-        Alert.alert(
-            'Xác nhận đặt tour',
-            `Bạn có muốn đặt tour ${tourName} với tổng tiền ${totalAmount.toLocaleString()} VNĐ?`,
-            [
-                { text: 'Hủy', style: 'cancel' },
-                {
-                    text: 'Xác nhận',
-                    onPress: () => {
-                        navigation.navigate('Payment', {
-                            tourId,
-                            amount: totalAmount,
-                            orderInfo: {
-                                fullName,
-                                phone,
-                                email,
-                                citizen,
-                                address,
-                                adults: parseInt(adults),
-                                children: parseInt(children),
-                                departureDate: selectedDate.toISOString().split('T')[0],
-                            },
-                        });
+
+        const bookingData = {
+            tourId,
+            adults: parseInt(adults),
+            children: parseInt(children),
+            tourScheduleId,
+        };
+
+        try {
+            // Gọi API bookTour
+            const bookingResult = await bookTour(bookingData, navigation);
+
+            // Hiển thị thông báo đặt tour thành công
+            Alert.alert(
+                'Thành công',
+                'Đặt tour thành công! Vui lòng kiểm tra email để xem chi tiết.',
+                [
+                    {
+                        text: 'OK',
+                        onPress: () => {
+                            // Điều hướng về HomeScreen sau khi đặt tour thành công
+                            navigation.navigate('CustomerTabs', { screen: 'Home' });
+                        },
                     },
-                },
-            ]
-        );
+                ]
+            );
+        } catch (error) {
+            Alert.alert('Lỗi', 'Đặt tour thất bại. Vui lòng thử lại.');
+        }
     };
 
     return (

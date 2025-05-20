@@ -1,6 +1,24 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_URL = 'http://192.168.0.106:8080';
+// Hàm để điều hướng về màn hình đăng nhập (sẽ được gọi từ AuthProvider)
+// const handleUnauthorized = async (navigation) => {
+//     console.error('Unauthorized, redirecting to login...');
+//     await AsyncStorage.removeItem('token');
+//     navigation.navigate('Login'); // Điều hướng về màn hình đăng nhập
+// };
+
+const handleUnauthorized = async (navigation) => {
+    console.error('Unauthorized, redirecting to login...');
+    await AsyncStorage.removeItem('token');
+    if (navigation && typeof navigation.navigate === 'function') {
+        navigation.navigate('Login'); // Điều hướng về màn hình đăng nhập
+    } else {
+        console.warn('Navigation object is undefined or invalid. Cannot redirect to login.');
+    }
+};
+
+const API_URL = 'http://192.168.0.103:8080';
 
 const API = axios.create({
     baseURL: API_URL,
@@ -9,48 +27,49 @@ const API = axios.create({
     },
 });
 
-API.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
+// Hàm tạo API với navigation để xử lý điều hướng khi cần
+const createAPI = (navigation) => {
+    API.interceptors.request.use(
+        async (config) => {
+            const token = await AsyncStorage.getItem('token');
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+            return config;
+        },
+        (error) => Promise.reject(error)
+    );
+
+    API.interceptors.response.use(
+        (response) => response,
+        async (error) => {
+            if (error.response?.status === 401) {
+                await handleUnauthorized(navigation);
+            }
+            return Promise.reject(error);
         }
-        return config;
-    },
-    (error) => Promise.reject(error)
-);
+    );
 
+    return API;
+};
 
-
-API.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            console.error('Unauthorized, redirecting to login...');
-            localStorage.removeItem('token');
-            window.location.href = '/login';
-        }
-        return Promise.reject(error);
-    }
-);
-
-export const bookTour = async (bookingData) => {
+export const bookTour = async (bookingData, navigation) => {
     try {
         console.log('Booking tour:', bookingData);
-        const response = await API.post('/tour_booking', bookingData);
+        const response = await createAPI(navigation).post('/tour_booking', bookingData);
         console.log('Book tour response:', response.data);
         return response.data.result;
     } catch (error) {
-        console.error('Error booking tour:', error.response?.data || error.message);
+        // console.error('Error booking tour:', error.response?.data || error.message);
         throw error.response?.data || error;
     }
 };
 
-
-export const getMyBookings = async () => {
+// Các hàm API khác cũng cần truyền navigation
+export const getMyBookings = async (navigation) => {
     try {
         console.log('Fetching my bookings');
-        const response = await API.get('/tour_booking/my');
+        const response = await createAPI(navigation).get('/tour_booking/my');
         console.log('My bookings response:', response.data);
         return response.data.result;
     } catch (error) {
@@ -59,10 +78,10 @@ export const getMyBookings = async () => {
     }
 };
 
-export const makePayment = async (paymentData) => {
+export const makePayment = async (paymentData, navigation) => {
     try {
         console.log('Making payment:', paymentData);
-        const response = await API.post('/payment', paymentData);
+        const response = await createAPI(navigation).post('/payment', paymentData);
         console.log('Payment response:', response.data);
         return response.data.result;
     } catch (error) {
@@ -71,10 +90,10 @@ export const makePayment = async (paymentData) => {
     }
 };
 
-export const getVnpayUrl = async (bookingId, amount) => {
+export const getVnpayUrl = async (bookingId, amount, navigation) => {
     try {
         console.log('Fetching VNPAY URL for bookingId:', bookingId, 'amount:', amount);
-        const response = await API.get(`/payment/vnpay-url?bookingId=${bookingId}&amount=${amount}`);
+        const response = await createAPI(navigation).get(`/payment/vnpay-url?bookingId=${bookingId}&amount=${amount}`);
         console.log('VNPAY URL response:', response.data);
         return response.data;
     } catch (error) {
@@ -83,10 +102,10 @@ export const getVnpayUrl = async (bookingId, amount) => {
     }
 };
 
-export const getUserPayments = async () => {
+export const getUserPayments = async (navigation) => {
     try {
         console.log('Fetching user payments');
-        const response = await API.get('/payment/user');
+        const response = await createAPI(navigation).get('/payment/user');
         console.log('User payments response:', response.data);
         return response.data.result;
     } catch (error) {
@@ -95,10 +114,10 @@ export const getUserPayments = async () => {
     }
 };
 
-export const getAllBookings = async () => {
+export const getAllBookings = async (navigation) => {
     try {
         console.log('Fetching all bookings');
-        const response = await API.get('/tour_booking/all');
+        const response = await createAPI(navigation).get('/tour_booking/all');
         console.log('All bookings response:', response.data);
         return response.data.result;
     } catch (error) {
@@ -107,10 +126,10 @@ export const getAllBookings = async () => {
     }
 };
 
-export const assignEmployee = async (bookingId, data) => {
+export const assignEmployee = async (bookingId, data, navigation) => {
     try {
         console.log('Assigning employee to booking:', bookingId, data);
-        const response = await API.patch(`/tour_booking/${bookingId}/assign`, data);
+        const response = await createAPI(navigation).patch(`/tour_booking/${bookingId}/assign`, data);
         console.log('Assign employee response:', response.data);
         return response.data.result;
     } catch (error) {
@@ -119,10 +138,10 @@ export const assignEmployee = async (bookingId, data) => {
     }
 };
 
-export const assignEmployeeToTour = async (tourId, data) => {
+export const assignEmployeeToTour = async (tourId, data, navigation) => {
     try {
         console.log('Assigning employee to tour:', tourId, data);
-        const response = await API.patch(`/tour_booking/tour/${tourId}/assign`, data);
+        const response = await createAPI(navigation).patch(`/tour_booking/tour/${tourId}/assign`, data);
         console.log('Assign employee to tour response:', response.data);
         return response.data.result;
     } catch (error) {
@@ -131,10 +150,10 @@ export const assignEmployeeToTour = async (tourId, data) => {
     }
 };
 
-export const getEmployees = async () => {
+export const getEmployees = async (navigation) => {
     try {
         console.log('Fetching employees');
-        const response = await API.get('/tour_booking/employees');
+        const response = await createAPI(navigation).get('/tour_booking/employees');
         console.log('Employees response:', response.data);
         return response.data.result;
     } catch (error) {
@@ -143,10 +162,10 @@ export const getEmployees = async () => {
     }
 };
 
-export const getEmployeeStats = async () => {
+export const getEmployeeStats = async (navigation) => {
     try {
         console.log('Fetching employee stats');
-        const response = await API.get('/tour_booking/employee-stats');
+        const response = await createAPI(navigation).get('/tour_booking/employee-stats');
         console.log('Employee stats response:', response.data);
         return response.data.result;
     } catch (error) {
@@ -155,4 +174,4 @@ export const getEmployeeStats = async () => {
     }
 };
 
-export default API;
+export default createAPI;

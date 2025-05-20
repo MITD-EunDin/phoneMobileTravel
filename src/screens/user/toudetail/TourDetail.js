@@ -159,7 +159,8 @@ const TourDetails = ({ route }) => {
                     transportation: tour.transportation,
                     accommodation: tour.accommodation,
                     firstImage: tour.images[0],
-                    departureDate: tour.tourSchedules?.[0]?.departureDate || 'Chưa có lịch'
+                    departureDate: tour.tourSchedules?.[0]?.departureDate || null,
+                    tourScheduleId: tour.tourSchedules?.[0]?.id || null
                   }),
                 },
               ]

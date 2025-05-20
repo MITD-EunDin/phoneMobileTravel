@@ -30,8 +30,6 @@ const LoginScreen = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetMessage, setResetMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const navigation = useNavigation();
@@ -48,11 +46,11 @@ const LoginScreen = () => {
 
     if (user) {
       const targetScreen = Array.isArray(user.roles) && (user.roles.includes("ADMIN") || user.roles.includes("ROLE_ADMIN")) ? "ADMIN" : "USER";
-      navigation.replace(targetScreen); // Dùng replace để tránh quay lại Login
+      navigation.replace(targetScreen);
     }
   }, [user, navigation]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async () => {
     if (!username.trim() || !password.trim()) {
       setError("Vui lòng nhập tên đăng nhập và mật khẩu.");
       return;
@@ -61,28 +59,27 @@ const LoginScreen = () => {
     setLoading(true);
 
     try {
+      // Sử dụng loginUser từ useAuth
       const userData = await login(username, password);
       if (userData && Array.isArray(userData.roles)) {
-        // Lưu username nếu nhớ mật khẩu
         if (rememberMe) {
           await AsyncStorage.setItem("rememberedUsername", username);
         } else {
           await AsyncStorage.removeItem("rememberedUsername");
         }
-        // Điều hướng
         const targetScreen = userData.roles.includes("ADMIN") || userData.roles.includes("ROLE_ADMIN") ? "ADMIN" : "USER";
-        navigation.replace(targetScreen); // Dùng replace để tránh quay lại
+        navigation.replace(targetScreen);
       } else {
         setError("Dữ liệu người dùng không hợp lệ.");
       }
     } catch (err) {
-      setError(err.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
-      Alert.alert("Lỗi đăng nhập", err.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
+      const errorMessage = err.message || "Có lỗi xảy ra. Vui lòng thử lại sau.";
+      setError(errorMessage);
+      Alert.alert("Lỗi đăng nhập", errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -127,7 +124,7 @@ const LoginScreen = () => {
           />
           <Text style={styles.checkboxLabel}>Nhớ tôi</Text>
         </TouchableOpacity>
-        <TouchableOpacity >
+        <TouchableOpacity>
           <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
         </TouchableOpacity>
       </View>
@@ -143,7 +140,7 @@ const LoginScreen = () => {
 
       <Text style={styles.socialText}>Hoặc đăng nhập với</Text>
       <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton} >
+        <TouchableOpacity style={styles.socialButton}>
           <Icon name="google" size={30} color={COLORS.red} />
         </TouchableOpacity>
       </View>
@@ -157,7 +154,6 @@ const LoginScreen = () => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

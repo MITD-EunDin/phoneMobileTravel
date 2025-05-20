@@ -16,12 +16,18 @@ const AppNavigator = () => {
   console.log("AppNavigator - user:", user); // Debug user
   console.log("AppNavigator - roles:", user?.roles); // Debug roles
 
+  const initialRouteName = user
+    ? user.roles?.includes('ADMIN') || user.roles?.includes('ROLE_ADMIN')
+      ? 'ADMIN'
+      : 'USER'
+    : 'Login';
+
   return (
     <View style={{ flex: 1 }}>
       <NavigationContainer>
         <Stack.Navigator
           screenOptions={{ headerShown: false }}
-          initialRouteName={user ? (user.roles?.includes("ADMIN") || user.roles?.includes("ROLE_ADMIN") ? "ADMIN" : "USER") : "Login"}
+          initialRouteName={initialRouteName}
         >
           {!user ? (
             <>

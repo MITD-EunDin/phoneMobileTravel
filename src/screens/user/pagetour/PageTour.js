@@ -1,12 +1,11 @@
 import React, { useContext } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { ToursContext } from '../../../contexts/ToursContext';
+import { filterKeyword, ToursContext } from '../../../contexts/ToursContext';
 import { COLORS } from '../../../stysles/theme';
 import { filterPopular, filterDiscountTours, filterRegion, filterDuration, filterDomesticTours, filterInternationalTours } from '../../../contexts/ToursContext';
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/png?text=Image+Not+Found';
 
 const PageTour = ({ route, navigation }) => {
-  const { type } = route.params; // 'popular' hoặc 'discounted'
   const { filterType, value } = route.params || {};
   const { tours = [] } = useContext(ToursContext);
 
@@ -26,6 +25,12 @@ const PageTour = ({ route, navigation }) => {
       break;
     case 'duration':
       filteredTours = filterDuration(tours, value);
+      break;
+    case 'duration':
+      filteredTours = filterDuration(tours, value);
+      break;
+    case 'searchkeyword':
+      filteredTours = filterKeyword(tours, value);
       break;
     default:
       filteredTours = tours;

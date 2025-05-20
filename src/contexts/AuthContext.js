@@ -1,43 +1,89 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { login, introspectToken, getMyInfo } from "../api/Api";
-import { saveTokenToStorage, getTokenFromStorage, removeTokenFromStorage } from "../utils/auth";
-// import { signInWithGoogle, sendPasswordReset } from "../firebase/firebase";
+import {
+  login,
+  introspectToken,
+  getMyInfo,
+  loginWithGoogleApi,
+  updatePasswordApi,
+} from "../api/Api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// import { signInWithGoogle, sendPasswordReset } from "../firebase/";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState(null); // Khởi tạo token là null
 
+  // Hàm kiểm tra token
   const checkToken = (token) => {
     if (!token || typeof token !== "string") {
-      throw new Error("InvalidTokenError: Invalid token specified: must be a string");
+      throw new Error(
+        "InvalidTokenError: Invalid token specified: must be a string"
+      );
     }
     return true;
   };
 
+  // Hàm lưu token vào AsyncStorage
+  const saveTokenToStorage = async (token) => {
+    try {
+      await AsyncStorage.setItem("token", token);
+    } catch (error) {
+      console.error("Error saving token to AsyncStorage:", error);
+    }
+  };
+
+  // Hàm lấy token từ AsyncStorage
+  const getTokenFromStorage = async () => {
+    try {
+      return await AsyncStorage.getItem("token");
+    } catch (error) {
+      console.error("Error retrieving token from AsyncStorage:", error);
+      return null;
+    }
+  };
+
+  // Hàm xóa token từ AsyncStorage
+  const removeTokenFromStorage = async () => {
+    try {
+      await AsyncStorage.removeItem("token");
+    } catch (error) {
+      console.error("Error removing token from AsyncStorage:", error);
+    }
+  };
+
+  // Đăng nhập với username và password
   const loginUser = async (username, password) => {
     try {
-      // Gọi API đăng nhập
+      const storedToken = await getTokenFromStorage();
+      if (storedToken && typeof storedToken === "string") {
+        checkToken(storedToken);
+        const decoded = jwtDecode(storedToken);
+        const userInfo = await getMyInfo(storedToken);
+        if (userInfo && userInfo.id) {
+          const pendingPassword =
+            await AsyncStorage.getItem("pendingPasswordSync") || password;
+          await updatePasswordApi(userInfo.id, pendingPassword);
+          console.log(
+            "Mật khẩu đã được đồng bộ với backend cho người dùng:",
+            userInfo.id
+          );
+          await AsyncStorage.removeItem("pendingPasswordSync");
+        }
+      }
+
+      // Đăng nhập với mật khẩu đã đồng bộ
       const authResponse = await login(username, password);
       if (authResponse.token) {
-        // Lưu token vào AsyncStorage
         await saveTokenToStorage(authResponse.token);
         setToken(authResponse.token);
-        console.log("token :", token);
-
-        // Giải mã token
         const decoded = jwtDecode(authResponse.token);
         console.log("Token giải mã từ đăng nhập:", decoded);
 
-        // Lấy thông tin người dùng
         const userInfo = await getMyInfo(authResponse.token);
         console.log("Thông tin người dùng từ đăng nhập:", userInfo);
-
-        // Lưu userInfo vào AsyncStorage (tùy chọn, để tối ưu sau này)
-        await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
 
         // Chuyển scope thành roles (mảng)
         const scope = decoded.scope || userInfo.scope || "USER";
@@ -45,95 +91,112 @@ export const AuthProvider = ({ children }) => {
         const userData = { ...userInfo, roles };
         console.log("Dữ liệu người dùng từ đăng nhập:", userData);
 
-        // Cập nhật trạng thái user
         setUser(userData);
-
-        // Trả về userData để sử dụng (ví dụ, để điều hướng)
         return userData;
       }
       throw new Error("Không nhận được token từ backend.");
     } catch (error) {
       console.error("Lỗi đăng nhập:", error);
-      throw new Error("Đăng nhập thất bại: " + (error.message || "Thông tin đăng nhập không hợp lệ."));
+      throw new Error(
+        "Đăng nhập thất bại: " +
+          (error.message || "Thông tin đăng nhập không hợp lệ.")
+      );
     }
   };
 
-  const logout = async () => {
+  // Đăng nhập với Google
+  const loginWithGoogle = async () => {
     try {
-      await removeTokenFromStorage(); // Đảm bảo xóa token hoàn tất
-      await AsyncStorage.removeItem("userInfo"); // Xóa userInfo nếu có
-      setToken(null);
-      setUser(null);
-      return true; // Xác nhận đăng xuất thành công
+      const { user, idToken } = await signInWithGoogle();
+      const authResponse = await loginWithGoogleApi(idToken);
+      if (authResponse.token) {
+        await saveTokenToStorage(authResponse.token);
+        setToken(authResponse.token);
+        const decoded = jwtDecode(authResponse.token);
+        console.log("Google login decoded token:", decoded);
+
+        const userInfo = await getMyInfo(authResponse.token);
+        console.log("Google login userInfo:", userInfo);
+
+        // Chuyển scope thành roles (mảng)
+        const scope = decoded.scope || userInfo.scope || "USER";
+        const roles = scope.split(" ").filter(Boolean);
+        const userData = { ...userInfo, roles };
+        console.log("Google login userData:", userData);
+
+        setUser(userData);
+        return userData;
+      }
+      throw new Error("Không nhận được token từ Google login.");
     } catch (error) {
-      console.error("Lỗi khi đăng xuất:", error.message);
-      throw new Error(`Đăng xuất thất bại: ${error.message}`);
+      console.error("Google login error:", error);
+      throw new Error("Đăng nhập Google thất bại: " + error.message);
     }
   };
 
-  // useEffect để kiểm tra token khi khởi động
+  // Đặt lại mật khẩu
+  const resetPassword = async (email) => {
+    try {
+      await sendPasswordReset(email);
+      return true;
+    } catch (error) {
+      if (error.code === "auth/user-not-found") {
+        throw new Error("Email không tồn tại. Vui lòng kiểm tra lại.");
+      } else if (error.code === "auth/invalid-email") {
+        throw new Error("Email không hợp lệ. Vui lòng nhập đúng định dạng email.");
+      }
+      throw new Error("Lỗi khi gửi email đặt lại mật khẩu: " + error.message);
+    }
+  };
+
+  // Đăng xuất
+  const logout = () => {
+    removeTokenFromStorage();
+    setToken(null);
+    setUser(null);
+  };
+
+  // Kiểm tra token khi component mount
   useEffect(() => {
-    const checkStoredToken = async () => {
-      try {
-        const storedToken = await getTokenFromStorage(); // Sử dụng await
-        if (storedToken && typeof storedToken === "string") {
+    const checkTokenAndLoad = async () => {
+      const storedToken = await getTokenFromStorage();
+      if (storedToken && typeof storedToken === "string") {
+        try {
           checkToken(storedToken);
           const decoded = jwtDecode(storedToken);
-          if (__DEV__) {
-            console.log("Check token decoded:", decoded); // Chỉ log trong dev
-          }
-
-          // Kiểm tra userInfo trong AsyncStorage trước
-          const storedUserInfo = await AsyncStorage.getItem("userInfo");
-          if (storedUserInfo) {
-            const userInfo = JSON.parse(storedUserInfo);
-            const scope = decoded.scope || userInfo.scope || "USER";
-            const roles = scope.split(" ").filter(Boolean);
-            const userData = { ...userInfo, roles };
-            if (__DEV__) {
-              console.log("Check token userData from AsyncStorage:", userData);
-            }
-            setUser(userData);
-            setToken(storedToken);
-            return;
-          }
-
-          // Nếu không có userInfo, gọi API
+          console.log("Check token decoded:", decoded);
           const introspectResponse = await introspectToken(storedToken);
           if (introspectResponse.valid && decoded.exp * 1000 > Date.now()) {
             const userInfo = await getMyInfo(storedToken);
-            if (__DEV__) {
-              console.log("Check token userInfo from API:", userInfo);
-            }
-            await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo));
+            console.log("Check token userInfo:", userInfo);
+
+            // Chuyển scope thành roles (mảng)
             const scope = decoded.scope || userInfo.scope || "USER";
             const roles = scope.split(" ").filter(Boolean);
             const userData = { ...userInfo, roles };
-            if (__DEV__) {
-              console.log("Check token userData from API:", userData);
-            }
+            console.log("Check token userData:", userData);
+
             setUser(userData);
             setToken(storedToken);
           } else {
-            await logout();
+            logout();
           }
-        } else {
-          if (__DEV__) {
-            console.log("Không có token hợp lệ trong AsyncStorage:", storedToken);
-          }
-          await logout();
+        } catch (error) {
+          console.error("Token validation error:", error);
+          logout();
         }
-      } catch (error) {
-        console.error("Lỗi khi kiểm tra token:", error.message);
-        await logout();
+      } else {
+        console.log("Không có token hợp lệ trong AsyncStorage:", storedToken);
+        logout();
       }
     };
-
-    checkStoredToken();
+    checkTokenAndLoad();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, login: loginUser, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, login: loginUser, loginWithGoogle, resetPassword, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -238,12 +238,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     priceText: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: '700',
         color: COLORS.red,
     },
     durationText: {
-        fontSize: 16,
+        fontSize: 14,
         color: COLORS.gray,
     },
     sectionTitle: {

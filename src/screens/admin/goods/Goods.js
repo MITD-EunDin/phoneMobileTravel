@@ -7,9 +7,9 @@ import { getAllBookings } from '../../../api/BookingApi.js'; // Import API
 
 const Goods = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [tours, setTours] = useState([]); // State để lưu danh sách tour từ API
-  const [loading, setLoading] = useState(true); // State cho trạng thái loading
-  const [error, setError] = useState(null); // State cho lỗi
+  const [tours, setTours] = useState([]); 
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
 
   // Hàm lấy dữ liệu từ API
   useEffect(() => {
@@ -17,12 +17,11 @@ const Goods = ({ navigation }) => {
       try {
         setLoading(true);
         const bookings = await getAllBookings();
-        // Ánh xạ dữ liệu từ API để khớp với giao diện
         const mappedTours = bookings.map((booking) => ({
-          id: booking.id.toString(), // Đảm bảo id là chuỗi
+          id: booking.id.toString(), 
           code: booking.code || 'N/A',
           status: booking.status || 'Chưa xác định',
-          statusColor: booking.statusColor || getStatusColor(booking.status), // Gán màu dựa trên status nếu API không trả về
+          statusColor: booking.statusColor || getStatusColor(booking.status), 
           customerName: booking.customerName || 'Khách hàng không xác định',
           tourName: booking.tourName || 'Tour không xác định',
           phone: booking.phone || 'N/A',

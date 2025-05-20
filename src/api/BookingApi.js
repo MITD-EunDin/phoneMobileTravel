@@ -1,6 +1,6 @@
 import axios from 'axios';
-
-const API_URL = 'http://192.168.53.232:8080';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const API_URL = 'http://localhost:8080';
 
 const API = axios.create({
     baseURL: API_URL,
@@ -10,25 +10,29 @@ const API = axios.create({
 });
 
 API.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => Promise.reject(error)
+     async (config) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    } catch (error) {
+      console.error('Error getting token from AsyncStorage:', error);
+      return config;
+    }
+  },
+  (error) => Promise.reject(error)
 );
 
 
 
 API.interceptors.response.use(
     (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            console.error('Unauthorized, redirecting to login...');
-            localStorage.removeItem('token');
-            window.location.href = '/login';
+  async (error) => {
+    if (error.response?.status === 401) {
+      console.error('Unauthorized, removing token...');
+      await AsyncStorage.removeItem('token');
         }
         return Promise.reject(error);
     }

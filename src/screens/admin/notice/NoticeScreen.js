@@ -1,6 +1,25 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  StyleSheet,
+  Platform,
+  ActivityIndicator,
+  FlatList,
+} from "react-native";
 import { X, Mail, MailOpen, Plus } from "lucide-react-native";
-import {getNotifications,getAllNotifications,markNotificationAsRead,connectWebSocket,createDiscountNotification} from "../../../api/Notification";
+import {
+  getNotifications,
+  getAllNotifications,
+  markNotificationAsRead,
+  connectWebSocket,
+  createDiscountNotification,
+} from "../../../api/Notification";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Modal from "react-native-modal"; // Sử dụng react-native-modal
 import styles from "./NoticeStyle";
 
 const generateUniqueId = () => {
@@ -59,7 +78,12 @@ const mapTypeToTab = (type) => {
 };
 
 const mapNotification = (notification) => {
-  if (!notification.id || !notification.title || !notification.createdAt || !notification.message) {
+  if (
+    !notification.id ||
+    !notification.title ||
+    !notification.createdAt ||
+    !notification.message
+  ) {
     console.warn("Invalid notification data:", notification);
   }
   return {
@@ -85,46 +109,69 @@ function timeAgo(dateString) {
   return `${Math.floor(diffInHours / 24)} ngày trước`;
 }
 
-export default function NotificationManagement() {
+export default function Notice() {
   const [notifications, setNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [activeTab, setActiveTab] = useState("Tất cả");
   const [error, setError] = useState(null);
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showInlineForm, setShowInlineForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     message: "",
     daysValid: 3,
   });
   const [loading, setLoading] = useState(false);
-  const token = localStorage.getItem("token");
+  const [token, setToken] = useState(null);
   const wsRef = useRef(null);
 
-  // Kiểm tra quyền admin khi component mount
-  useEffect(() => {
-    if (token) {
-      setIsAdminUser(isAdmin(token));
+  // Hàm lấy token từ AsyncStorage
+  const getToken = async () => {
+    try {
+      return await AsyncStorage.getItem("token");
+    } catch (error) {
+      console.error("Error retrieving token:", error);
+      return null;
     }
-  }, [token]);
+  };
 
-  // Lấy danh sách thông báo khi component mount
+  // Khởi tạo token và kiểm tra quyền admin
+  useEffect(() => {
+    const fetchTokenAndInitialize = async () => {
+      const fetchedToken = await getToken();
+      if (fetchedToken) {
+        setToken(fetchedToken);
+        setIsAdminUser(isAdmin(fetchedToken));
+      } else {
+        setError("Không tìm thấy token. Vui lòng đăng nhập lại.");
+      }
+    };
+    fetchTokenAndInitialize();
+  }, []);
+
+  // Lấy danh sách thông báo
   useEffect(() => {
     const fetchNotifications = async () => {
+      if (!token) return;
       try {
         setLoading(true);
-        if (!token) {
-          throw new Error("No token found");
-        }
-        console.log("Fetching notifications, isAdminUser:", isAdminUser, "activeTab:", activeTab);
+        console.log(
+          "Fetching notifications, isAdminUser:",
+          isAdminUser,
+          "activeTab:",
+          activeTab
+        );
         const data = isAdminUser
           ? await getAllNotifications(token)
           : await getNotifications(token);
         console.log("API Notifications:", data);
         const mappedData = data.map(mapNotification);
         const sortedData = mappedData.sort((a, b) => {
-          const idA = typeof a.id === "string" && !isNaN(a.id) ? parseInt(a.id) : a.id;
-          const idB = typeof b.id === "string" && !isNaN(b.id) ? parseInt(b.id) : b.id;
+          const idA =
+            typeof a.id === "string" && !isNaN(a.id) ? parseInt(a.id) : a.id;
+          const idB =
+            typeof b.id === "string" && !isNaN(b.id) ? parseInt(b.id) : b.id;
           return idB - idA;
         });
         console.log("Sorted Notifications:", sortedData);
@@ -155,7 +202,9 @@ export default function NotificationManagement() {
         isActive: true,
         isRead: false,
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        expiresAt: new Date(
+          Date.now() + 7 * 24 * 60 * 60 * 1000
+        ).toISOString(),
       });
       setNotifications((prev) => [newNotification, ...prev]);
     });
@@ -196,31 +245,32 @@ export default function NotificationManagement() {
   };
 
   // Xử lý thay đổi form
-  const handleFormChange = (e) => {
-    const { name, value } = e.target;
+  const handleFormChange = (name, value) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "daysValid" ? parseInt(value) : value,
+      [name]: name === "daysValid" ? parseInt(value) || 3 : value,
     }));
   };
 
   // Gửi thông báo mới
-  const handleCreateNotification = async (e) => {
-    e.preventDefault();
+  const handleCreateNotification = async () => {
     try {
       setLoading(true);
       await createDiscountNotification(formData, token);
       setError(null);
       setFormData({ title: "", message: "", daysValid: 3 });
       setShowForm(false);
+      setShowInlineForm(false);
       alert("Thông báo đã được tạo thành công!");
       const data = isAdminUser
         ? await getAllNotifications(token)
         : await getNotifications(token);
       const mappedData = data.map(mapNotification);
       const sortedData = mappedData.sort((a, b) => {
-        const idA = typeof a.id === "string" && !isNaN(a.id) ? parseInt(a.id) : a.id;
-        const idB = typeof b.id === "string" && !isNaN(b.id) ? parseInt(b.id) : b.id;
+        const idA =
+          typeof a.id === "string" && !isNaN(a.id) ? parseInt(a.id) : a.id;
+        const idB =
+          typeof b.id === "string" && !isNaN(b.id) ? parseInt(b.id) : b.id;
         return idB - idA;
       });
       setNotifications(sortedData);
@@ -243,157 +293,252 @@ export default function NotificationManagement() {
     setError(null);
   };
 
+  // Xử lý click vào modal header
+  const handleModalHeaderClick = () => {
+    setShowInlineForm(true);
+    setShowForm(false);
+  };
+
   // Lọc thông báo theo tab
-  const filteredNotifications = activeTab === "Tất cả"
-    ? notifications
-    : notifications.filter((n) => n.type === activeTab);
+  const filteredNotifications =
+    activeTab === "Tất cả"
+      ? notifications
+      : notifications.filter((n) => n.type === activeTab);
+
+  // Render tab item cho FlatList
+  const renderTabItem = ({ item }) => (
+    <TouchableOpacity
+      style={[styles.tabButton, activeTab === item ? styles.tabButtonActive : null]}
+      onPress={() => setActiveTab(item)}
+    >
+      <Text
+        style={[
+          styles.tabButtonText,
+          activeTab === item ? styles.tabButtonTextActive : null,
+        ]}
+      >
+        {item}
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
-    <div className={styles.container}>
+    <View style={styles.container}>
       {/* Hiển thị lỗi nếu có */}
-      {error && <div className={styles.error}>{error}</div>}
+      {error && <Text style={styles.error}>{error}</Text>}
 
       {/* Loading state */}
       {loading && (
-        <div className={styles.loadingOverlay}>
-          <div className={styles.loadingBox}>
-            <p className={styles.loadingText}>Đang tải...</p>
-          </div>
-        </div>
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingBox}>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text style={styles.loadingText}>Đang tải...</Text>
+          </View>
+        </View>
       )}
 
-      {/* Nút thêm thông báo cho admin */}
-      {isAdminUser && (
-        <div className="mb-4">
-          <button onClick={() => setShowForm(true)} className={styles.addButton}>
-            <Plus size={20} className={styles.addButtonIcon} />
-            Thêm thông báo
-          </button>
-        </div>
+      {/* Tabs */}
+      <View style={styles.List}>
+      <FlatList
+        horizontal
+        data={tabs}
+        renderItem={renderTabItem}
+        keyExtractor={(item) => item}
+        style={[styles.tabs, { height: 50 }]}
+        contentContainerStyle={{ height: 50 }}
+        showsHorizontalScrollIndicator={false}
+      />
+</View>
+      {/* Danh sách thông báo */}
+      <ScrollView style={styles.notificationList}>
+        <Text style={styles.listHeader}>
+          Danh sách thông báo ({filteredNotifications.length})
+        </Text>
+        {filteredNotifications.length === 0 ? (
+          <Text style={styles.emptyMessage}>
+            Không có thông báo nào trong tab này.
+          </Text>
+        ) : (
+          filteredNotifications.map((notification) => (
+            <TouchableOpacity
+              key={notification.id}
+              style={styles.notificationItem}
+              onPress={() => handleNotificationClick(notification)}
+            >
+              <View style={styles.statusIconWrapper}>
+                {notification.status === "Chưa đọc" ? (
+                  <Mail size={20} color="#ff0000" />
+                ) : (
+                  <MailOpen size={20} color="#000" />
+                )}
+              </View>
+              <View style={styles.notificationContent}>
+                <Text style={styles.notificationTitle}>
+                  {notification.title}
+                </Text>
+                <Text style={styles.notificationDate}>
+                  {new Date(notification.date).toLocaleString()}
+                </Text>
+              </View>
+              <Text style={styles.notificationTime}>
+                {timeAgo(notification.date)}
+              </Text>
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
+
+      {/* Hiển thị thông báo chi tiết */}
+      {selectedNotification && (
+        <View style={styles.detailPanel}>
+          <TouchableOpacity
+            style={styles.closeDetailButton}
+            onPress={() => setSelectedNotification(null)}
+          >
+            <X size={18} color="#000" />
+          </TouchableOpacity>
+          <Text style={styles.detailTitle}>{selectedNotification.title}</Text>
+          <Text style={styles.detailDate}>
+            {new Date(selectedNotification.date).toLocaleString()}
+          </Text>
+          <Text style={styles.detailContent}>
+            {selectedNotification.content}
+          </Text>
+          <Text style={styles.detailSender}>
+            Người gửi: {selectedNotification.sender}
+          </Text>
+        </View>
       )}
 
       {/* Form tạo thông báo (modal) */}
       {showForm && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>Tạo thông báo giảm giá</h3>
-              <button onClick={handleCloseForm} className={styles.closeButton}>
-                <X size={24} className={styles.closeIcon} />
-              </button>
-            </div>
-            <form onSubmit={handleCreateNotification} className={styles.form}>
-              <div>
-                <label className={styles.formLabel}>Tiêu đề</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleFormChange}
-                  className={styles.formInput}
-                  required
-                />
-              </div>
-              <div>
-                <label className={styles.formLabel}>Nội dung</label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleFormChange}
-                  className={styles.formTextarea}
-                  required
-                ></textarea>
-              </div>
-              <div>
-                <label className={styles.formLabel}>Số ngày hiệu lực</label>
-                <input
-                  type="number"
-                  name="daysValid"
-                  value={formData.daysValid}
-                  onChange={handleFormChange}
-                  className={styles.formInput}
-                  min="1"
-                  required
-                />
-              </div>
-              <div className={styles.formActions}>
-                <button type="button" onClick={handleCloseForm} className={styles.cancelButton}>
-                  Hủy
-                </button>
-                <button type="submit" className={styles.submitButton}>
-                  Tạo thông báo
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div className={styles.tabs}>
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            className={`${styles.tabButton} ${activeTab === tab ? styles.tabButtonActive : ""}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Danh sách thông báo */}
-      <div className={styles.notificationList}>
-        <h2 className={styles.listHeader}>
-          Danh sách thông báo ({filteredNotifications.length})
-        </h2>
-        {filteredNotifications.length === 0 ? (
-          <p className={styles.emptyMessage}>Không có thông báo nào trong tab này.</p>
-        ) : (
-          <div>
-            {filteredNotifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={styles.notificationItem}
-                onClick={() => handleNotificationClick(notification)}
+        <Modal isVisible={showForm} onBackdropPress={handleCloseForm}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity
+              style={styles.modalHeader}
+              onPress={handleModalHeaderClick}
+            >
+              <Text style={styles.modalTitle}>Tạo thông báo giảm giá</Text>
+              <TouchableOpacity
+                onPress={handleCloseForm}
+                style={styles.closeButton}
               >
-                <div className={styles.statusIconWrapper}>
-                  {notification.status === "Chưa đọc" ? (
-                    <Mail size={20} className={styles.statusIconUnread} />
-                  ) : (
-                    <MailOpen size={20} className={styles.statusIconRead} />
-                  )}
-                </div>
-                <div className={styles.notificationContent}>
-                  <div className={styles.notificationTitle}>{notification.title}</div>
-                  <div className={styles.notificationDate}>
-                    {new Date(notification.date).toLocaleString()}
-                  </div>
-                </div>
-                <div className={styles.notificationTime}>{timeAgo(notification.date)}</div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Hiển thị thông báo chi tiết */}
-      {selectedNotification && (
-        <div className={styles.detailPanel}>
-          <button
-            className={styles.closeDetailButton}
-            onClick={() => setSelectedNotification(null)}
-          >
-            <X size={18} />
-          </button>
-          <h3 className={styles.detailTitle}>{selectedNotification.title}</h3>
-          <p className={styles.detailDate}>
-            {new Date(selectedNotification.date).toLocaleString()}
-          </p>
-          <p className={styles.detailContent}>{selectedNotification.content}</p>
-          <p className={styles.detailSender}>Người gửi: {selectedNotification.sender}</p>
-        </div>
+                <X size={24} color="#000" />
+              </TouchableOpacity>
+            </TouchableOpacity>
+            <ScrollView style={styles.form}>
+              <Text style={styles.formLabel}>Tiêu đề</Text>
+              <TextInput
+                style={styles.formInput}
+                value={formData.title}
+                onChangeText={(text) => handleFormChange("title", text)}
+                placeholder="Nhập tiêu đề"
+                autoCapitalize="none"
+              />
+              <Text style={styles.formLabel}>Nội dung</Text>
+              <TextInput
+                style={[styles.formInput, styles.formTextarea]}
+                value={formData.message}
+                onChangeText={(text) => handleFormChange("message", text)}
+                placeholder="Nhập nội dung"
+                multiline
+                numberOfLines={4}
+              />
+              <Text style={styles.formLabel}>Số ngày hiệu lực</Text>
+              <TextInput
+                style={styles.formInput}
+                value={String(formData.daysValid)}
+                onChangeText={(text) => handleFormChange("daysValid", text)}
+                placeholder="Số ngày"
+                keyboardType="numeric"
+              />
+              <View style={styles.formActions}>
+                <TouchableOpacity
+                  onPress={handleCloseForm}
+                  style={styles.cancelButton}
+                >
+                  <Text style={styles.cancelButtonText}>Hủy</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleCreateNotification}
+                  style={styles.submitButton}
+                >
+                  <Text style={styles.submitButtonText}>Tạo thông báo</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </Modal>
       )}
-    </div>
+
+      {/* Form inline khi click modal header */}
+      {showInlineForm && (
+        <View style={styles.inlineFormContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Form trên màn hình</Text>
+              <TouchableOpacity
+                onPress={() => setShowInlineForm(false)}
+                style={styles.closeButton}
+              >
+                <X size={24} color="#000" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={styles.form}>
+              <Text style={styles.formLabel}>Tiêu đề</Text>
+              <TextInput
+                style={styles.formInput}
+                value={formData.title}
+                onChangeText={(text) => handleFormChange("title", text)}
+                placeholder="Nhập tiêu đề"
+                autoCapitalize="none"
+              />
+              <Text style={styles.formLabel}>Nội dung</Text>
+              <TextInput
+                style={[styles.formInput, styles.formTextarea]}
+                value={formData.message}
+                onChangeText={(text) => handleFormChange("message", text)}
+                placeholder="Nhập nội dung"
+                multiline
+                numberOfLines={4}
+              />
+              <Text style={styles.formLabel}>Số ngày hiệu lực</Text>
+              <TextInput
+                style={styles.formInput}
+                value={String(formData.daysValid)}
+                onChangeText={(text) => handleFormChange("daysValid", text)}
+                placeholder="Số ngày"
+                keyboardType="numeric"
+              />
+              <View style={styles.formActions}>
+                <TouchableOpacity
+                  onPress={() => setShowInlineForm(false)}
+                  style={styles.cancelButton}
+                >
+                  <Text style={styles.cancelButtonText}>Hủy</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleCreateNotification}
+                  style={styles.submitButton}
+                >
+                  <Text style={styles.submitButtonText}>Tạo thông báo</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      )}
+
+      {/* Nút thêm thông báo cho admin */}
+      {isAdminUser && (
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => setShowForm(true)}
+        >
+          <Plus size={20} color="#fff" />
+          <Text style={styles.addButtonText}>Thêm thông báo</Text>
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }

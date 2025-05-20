@@ -57,12 +57,16 @@ const styles = StyleSheet.create({
 
   // Button for adding notification
   addButton: {
-    flexDirection: "row",
-    alignItems: "center",
+    zIndex:999,
+    position: 'absolute',
+    display:'flex',
+    flexDirection:'row',
+    bottom: 20,
+    right: 20,
     paddingVertical: 8, // 0.5rem
     paddingHorizontal: 16, // 1rem
-    backgroundColor: "#3b82f6", // bg-blue-500
-    color: "#ffffff", // text-white (for Text inside)
+    backgroundColor: "#B3D1F6", // bg-blue-500
+    color: "#386AFF", // text-white (for Text inside)
     borderRadius: 6, // 0.375rem
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -92,6 +96,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     zIndex: 50,
+  },
+  List:{
+height:'fit-content',
   },
 
   modalContent: {
@@ -212,30 +219,25 @@ const styles = StyleSheet.create({
 
   // Tabs
   tabs: {
-    flexDirection: "row",
-    marginBottom: 16, // 1rem
-    paddingBottom: 8, // 0.5rem
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
+    marginBottom: 16,
+     height:50,
   },
-
   tabButton: {
-    paddingVertical: 8, // 0.5rem
-    paddingHorizontal: 16, // 1rem
-    borderRadius: 6, // 0.375rem
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
     backgroundColor: "#e5e7eb",
+    marginRight: 8,
+    height:'fit-content',
   },
-
   tabButtonText: {
     color: "#374151",
     fontSize: 16,
   },
-
   tabButtonActive: {
     backgroundColor: "#3b82f6",
   },
-
-  tabButtonActiveText: {
+  tabButtonTextActive: {
     color: "#ffffff",
     fontSize: 16,
   },

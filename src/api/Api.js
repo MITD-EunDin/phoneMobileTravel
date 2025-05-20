@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 // Địa chỉ base URL của backend
-// const API_URL = Platform.OS === 'android' ? 'http://192.168.53.232:8080' : 'http://localhost:8080';
-const API_URL = 'http://192.168.53.232:8080';
+// const API_URL = Platform.OS === 'android' ? 'http://localhost:8080' : 'http://localhost:8080';
+const API_URL = 'http://localhost:8080';
 
 // Tạo instance của axios với cấu hình mặc định
 const api = axios.create({

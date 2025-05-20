@@ -5,6 +5,7 @@ export const ToursContext = createContext();
 
 export const ToursProvider = ({ children }) => {
     const [tours, setTours] = useState([]);
+    const [error, setError] = useState(null); // Thêm trạng thái lỗi
 
     // Lấy danh sách tour từ API khi khởi tạo
     useEffect(() => {
@@ -14,7 +15,8 @@ export const ToursProvider = ({ children }) => {
                 console.log('Dữ liệu tour từ API:', tourData);
 
                 if (!Array.isArray(tourData)) {
-                    console.error('Dữ liệu tour không hợp lệ');
+                    console.error('Dữ liệu tour không hợp lệ:', tourData);
+                    setError('Dữ liệu tour không hợp lệ.');
                     setTours([]);
                     return;
                 }
@@ -22,7 +24,7 @@ export const ToursProvider = ({ children }) => {
                 // Ánh xạ trường images thành image (lấy ảnh đầu tiên)
                 const mappedTours = tourData.map(tour => ({
                     ...tour,
-                    image: tour.images && tour.images.length > 0 ? tour.images[0] : null,
+                    image: tour.images && Array.isArray(tour.images) && tour.images.length > 0 ? tour.images[0] : null,
                 }));
 
                 // Kiểm tra trường image sau khi ánh xạ
@@ -35,36 +37,21 @@ export const ToursProvider = ({ children }) => {
                 });
 
                 setTours(mappedTours);
+                setError(null); // Xóa lỗi nếu thành công
             } catch (err) {
-                console.error('Lỗi khi lấy tour:', err);
+                const errorMessage = err.message || 'Không thể lấy danh sách tour.';
+                console.error('Lỗi khi lấy tour:', errorMessage, err);
+                setError(errorMessage);
+                setTours([]);
             }
         };
 
         fetchTours();
-    }, []); // Chạy một lần khi mount
+    }, []);
 
     return (
-        <ToursContext.Provider value={{ tours }}>
+        <ToursContext.Provider value={{ tours, error }}>
             {children}
         </ToursContext.Provider>
     );
 };
-
-// Hàm lọc tour
-export const filterDomesticTours = (allTours) =>
-    allTours.filter((tour) => tour.tourType?.toLowerCase() === 'domestic');
-
-export const filterInternationalTours = (allTours) =>
-    allTours.filter((tour) => tour.tourType?.toLowerCase() === 'international');
-
-export const filterDiscountTours = (allTours) =>
-    allTours.filter((tour) => tour.discount > 0);
-
-export const filterPopular = (allTours) =>
-    allTours.filter((tour) => tour.discount === 0 || tour.discount < 0 );
-
-export const filterRegion = (allTours) => 
-    allTours.filter((tour) => tour.region?.toLowerCase() === region.toLowerCase());
-
-export const filterDuration = (allTours) =>
-    allTours.filter((tour) => tour.duration?.toLowerCase() === duration.toLowerCase());

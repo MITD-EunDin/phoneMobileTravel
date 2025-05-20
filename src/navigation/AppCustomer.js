@@ -10,6 +10,7 @@ import PageTour from '../screens/user/pagetour/PageTour';
 import CommonHeader from '../components/CommonHeader';
 import TopBar from '../components/Top/TopBar';
 import Notice from '../screens/user/notice/Notice';
+import BookingScreen from '../screens/user/bookingscreen';
 import { Home, Map, ShoppingBag, User } from 'lucide-react-native';
 
 const Tab = createBottomTabNavigator();
@@ -95,6 +96,14 @@ const CustomerNavigator = ({ onLogout }) => {
                 component={Notice}
                 options={{
                     header: (props) => <CommonHeader {...props} title="Thông báo" />,
+                    headerShown: true,
+                }}
+            />
+            <Stack.Screen
+                name="Booking"
+                component={BookingScreen}
+                options={{
+                    header: (props) => <CommonHeader {...props} title="Đặt Tour" />,
                     headerShown: true,
                 }}
             />

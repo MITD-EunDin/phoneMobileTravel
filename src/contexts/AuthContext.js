@@ -8,7 +8,7 @@ import {
   updatePasswordApi,
 } from "../api/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { signInWithGoogle, sendPasswordReset } from "../firebase/firebase";
+// import { signInWithGoogle, sendPasswordReset } from "../firebase/";
 
 const AuthContext = createContext();
 
@@ -57,7 +57,6 @@ export const AuthProvider = ({ children }) => {
   // Đăng nhập với username và password
   const loginUser = async (username, password) => {
     try {
-      // Kiểm tra token hiện tại và đồng bộ mật khẩu trước
       const storedToken = await getTokenFromStorage();
       if (storedToken && typeof storedToken === "string") {
         checkToken(storedToken);

@@ -3,8 +3,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
 // Địa chỉ base URL của backend
-// const API_URL = Platform.OS === 'android' ? 'http://localhost:8080' : 'http://localhost:8080';
+
+// const API_URL = Platform.OS === 'android' ? 'http://192.168.53.232:8080' : 'http://localhost:8080';
 const API_URL = 'http://localhost:8080';
+
 
 // Tạo instance của axios với cấu hình mặc định
 const api = axios.create({
@@ -61,10 +63,10 @@ api.interceptors.response.use(
     if (process.env.NODE_ENV === 'development') {
       console.error('API Error:', error.response?.status, error.message);
     }
-    const message = error.response?.data?.message || 
-                    (error.message.includes('ECONNREFUSED') 
-                      ? 'Không thể kết nối đến server. Kiểm tra xem backend có chạy trên cổng 8080 không.' 
-                      : 'Lỗi không xác định. Vui lòng kiểm tra mạng hoặc thử lại.');
+    const message = error.response?.data?.message ||
+      (error.message.includes('ECONNREFUSED')
+        ? 'Không thể kết nối đến server. Kiểm tra xem backend có chạy trên cổng 8080 không.'
+        : 'Lỗi không xác định. Vui lòng kiểm tra mạng hoặc thử lại.');
     return Promise.reject(new Error(message));
   }
 );

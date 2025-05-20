@@ -10,31 +10,26 @@ const PageTour = ({ route, navigation }) => {
   const { filterType, value } = route.params || {};
   const { tours = [] } = useContext(ToursContext);
 
-  // Lọc tour dựa trên type
-  // const filteredTours = type === 'popular'
-  //   ? tours.filter(tour => !tour.newPrice || tour.discount <= 0)
-  //   : tours.filter(tour => tour.newPrice && tour.discount > 0);
-
   let filteredTours = tours;
-    switch (filter) {
-        case 'popular':
-            filteredTours = filterPopular(tours);
-            break;
-        case 'discounted':
-            filteredTours = filterDiscountTours(tours);
-            break;
-        case 'region':
-            filteredTours = filterRegion(tours, value);
-            break;
-        case 'tourType':
-            filteredTours = value === 'domestic' ? filterDomesticTours(tours) : filterInternationalTours(tours);
-            break;
-        case 'duration':
-            filteredTours = filterDuration(tours, value);
-            break;
-        default:
-            filteredTours = tours;
-    }
+  switch (filterType) {
+    case 'popular':
+      filteredTours = filterPopular(tours);
+      break;
+    case 'discounted':
+      filteredTours = filterDiscountTours(tours);
+      break;
+    case 'region':
+      filteredTours = filterRegion(tours, value);
+      break;
+    case 'tourType':
+      filteredTours = value === 'domestic' ? filterDomesticTours(tours) : filterInternationalTours(tours);
+      break;
+    case 'duration':
+      filteredTours = filterDuration(tours, value);
+      break;
+    default:
+      filteredTours = tours;
+  }
 
   const renderTourItem = ({ item }) => (
     <TouchableOpacity
@@ -53,7 +48,7 @@ const PageTour = ({ route, navigation }) => {
       <Text style={styles.tourType}>{item.tourType}</Text>
       <View style={styles.detailsContainer}>
         <View>
-            <Text style={styles.cardDetail}>{item.duration || ''}</Text>
+          <Text style={styles.cardDetail}>{item.duration || ''}</Text>
         </View>
         <Text style={styles.infoText}>
           {item.tourSchedule?.departureDate || 'Chưa có lịch'}

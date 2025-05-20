@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "reac
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../contexts/AuthContext";
 import Icon from "react-native-vector-icons/FontAwesome";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS } from "../../stysles/theme";
 
 const FloatingInput = ({ type = "text", label, value, onChange, required = false, secureTextEntry = false, ...props }) => {
@@ -23,184 +24,140 @@ const FloatingInput = ({ type = "text", label, value, onChange, required = false
 };
 
 const LoginScreen = () => {
-  const { login, loginWithGoogle, resetPassword, user } = useAuth();
+  const { login, user } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetMessage, setResetMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
   const navigation = useNavigation();
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
-  setLoading(true);
-
-  try {
-    const userData = await login(username, password);
-    console.log("Login response:", userData);
-    if (userData && userData.roles) {
-      console.log("Phân quyền thành công, điều hướng đến:", userData.roles.includes("ADMIN") ? "Admin" : "Customer");
-      if (userData.roles.includes("ADMIN") || userData.roles.includes("ROLE_ADMIN")) {
-        navigation.navigate("Admin");
-      } else {
-        navigation.navigate("Customer");
-      }
-    } else {
-      console.log("User hoặc roles không hợp lệ:", userData);
-    }
-  } catch (err) {
-    console.error("LoginForm - Lỗi đăng nhập:", err);
-    setError(err.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
-  } finally {
-    setLoading(false);
-  }
-};
-
-  const handleGoogleLogin = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      const response = await loginWithGoogle();
-      console.log("LoginForm - Đăng nhập Google thành công:", response);
-    } catch (error) {
-      console.error("LoginForm - Lỗi đăng nhập Google:", error.response?.data || error.message);
-      setError("Đăng nhập Google thất bại: " + (error.response?.data?.message || error.message));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
-    setError("");
-    setResetMessage("");
-    setLoading(true);
-
-    try {
-      await resetPassword(resetEmail);
-      setResetMessage("Email đặt lại mật khẩu đã được gửi! Vui lòng kiểm tra hộp thư của bạn.");
-      setResetEmail("");
-      setTimeout(() => setShowResetPassword(false), 3000);
-    } catch (error) {
-      console.error("LoginForm - Lỗi đặt lại mật khẩu:", error);
-      setError(error.message || "Gửi email đặt lại mật khẩu thất bại. Vui lòng thử lại.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadRememberedUsername = async () => {
+      const savedUsername = await AsyncStorage.getItem("rememberedUsername");
+      if (savedUsername) {
+        setUsername(savedUsername);
+        setRememberMe(true);
+      }
+    };
+    loadRememberedUsername();
+
     if (user) {
-      console.log("LoginForm - Đối tượng người dùng:", user);
+      const targetScreen = Array.isArray(user.roles) && (user.roles.includes("ADMIN") || user.roles.includes("ROLE_ADMIN")) ? "ADMIN" : "USER";
+      navigation.replace(targetScreen); // Dùng replace để tránh quay lại Login
     }
-  }, [user]);
+  }, [user, navigation]);
+
+  const handleSubmit = async (e) => {
+    if (!username.trim() || !password.trim()) {
+      setError("Vui lòng nhập tên đăng nhập và mật khẩu.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+
+    try {
+      const userData = await login(username, password);
+      if (userData && Array.isArray(userData.roles)) {
+        // Lưu username nếu nhớ mật khẩu
+        if (rememberMe) {
+          await AsyncStorage.setItem("rememberedUsername", username);
+        } else {
+          await AsyncStorage.removeItem("rememberedUsername");
+        }
+        // Điều hướng
+        const targetScreen = userData.roles.includes("ADMIN") || userData.roles.includes("ROLE_ADMIN") ? "ADMIN" : "USER";
+        navigation.replace(targetScreen); // Dùng replace để tránh quay lại
+      } else {
+        setError("Dữ liệu người dùng không hợp lệ.");
+      }
+    } catch (err) {
+      setError(err.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
+      Alert.alert("Lỗi đăng nhập", err.message || "Có lỗi xảy ra. Vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <View style={styles.container}>
       <Image source={require("../../img/logoDTC.png")} style={styles.logo} />
-      <Text style={styles.title}>{showResetPassword ? "Quên mật khẩu" : "Đăng nhập"}</Text>
+      <Text style={styles.title}>Đăng nhập</Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {resetMessage ? <Text style={styles.success}>{resetMessage}</Text> : null}
 
-      {!showResetPassword ? (
-        <>
-          <FloatingInput
-            value={username}
-            onChange={setUsername}
-            label="Tên đăng nhập"
-            required
+      <FloatingInput
+        value={username}
+        onChange={setUsername}
+        label="Tên đăng nhập"
+        required
+      />
+      <View style={styles.inputContainer}>
+        <FloatingInput
+          value={password}
+          onChange={setPassword}
+          label="Mật khẩu"
+          required
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => setShowPassword(!showPassword)}
+        >
+          <Icon
+            name={showPassword ? "eye" : "eye-slash"}
+            size={20}
+            color={COLORS.gray}
           />
-          <View style={styles.inputContainer}>
-            <FloatingInput
-              value={password}
-              onChange={setPassword}
-              label="Mật khẩu"
-              required
-              secureTextEntry={!showPassword}
-            />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <Icon
-                name={showPassword ? "eye" : "eye-slash"}
-                size={20}
-                color={COLORS.gray}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.checkboxContainer}>
-            <TouchableOpacity
-              style={styles.checkboxWrapper}
-              onPress={() => setRememberMe(!rememberMe)}
-            >
-              <Icon
-                name={rememberMe ? "check-square-o" : "square-o"}
-                size={20}
-                color={rememberMe ? COLORS.blue : COLORS.gray}
-              />
-              <Text style={styles.checkboxLabel}>Nhớ mật khẩu</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowResetPassword(true)}>
-              <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleSubmit}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-            </Text>
-          </TouchableOpacity>
-
-          <Text style={styles.socialText}>Hoặc đăng nhập với</Text>
-          <View style={styles.socialContainer}>
-            <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
-              <Icon name="google" size={30} color={COLORS.red} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>Chưa có tài khoản? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-              <Text style={styles.footerLink}>Đăng ký</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      ) : (
-        <>
-          <FloatingInput
-            type="email"
-            value={resetEmail}
-            onChange={setResetEmail}
-            label="Email"
-            required
+        </TouchableOpacity>
+      </View>
+      <View style={styles.checkboxContainer}>
+        <TouchableOpacity
+          style={styles.checkboxWrapper}
+          onPress={() => setRememberMe(!rememberMe)}
+        >
+          <Icon
+            name={rememberMe ? "check-square-o" : "square-o"}
+            size={20}
+            color={rememberMe ? COLORS.blue : COLORS.gray}
           />
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleResetPassword}
-            disabled={loading}
-          >
-            <Text style={styles.buttonText}>
-              {loading ? "Đang gửi..." : "Gửi email đặt lại"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowResetPassword(false)}>
-            <Text style={styles.forgotPassword}>Quay lại đăng nhập</Text>
-          </TouchableOpacity>
-        </>
-      )}
+          <Text style={styles.checkboxLabel}>Nhớ tôi</Text>
+        </TouchableOpacity>
+        <TouchableOpacity >
+          <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
+        </TouchableOpacity>
+      </View>
+      <TouchableOpacity
+        style={[styles.button, loading && styles.buttonDisabled]}
+        onPress={handleSubmit}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>
+          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+        </Text>
+      </TouchableOpacity>
+
+      <Text style={styles.socialText}>Hoặc đăng nhập với</Text>
+      <View style={styles.socialContainer}>
+        <TouchableOpacity style={styles.socialButton} >
+          <Icon name="google" size={30} color={COLORS.red} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Chưa có tài khoản? </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+          <Text style={styles.footerLink}>Đăng ký</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

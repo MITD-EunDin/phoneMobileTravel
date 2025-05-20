@@ -22,7 +22,6 @@ const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/png?text=Image+Not+Found
 const HomeScreen = ({ navigation }) => {
     const { tours = [] } = useContext(ToursContext);
     const airplaneAnim = useRef(new Animated.Value(-300)).current;
-
     useEffect(() => {
         Animated.loop(
             Animated.timing(airplaneAnim, {
@@ -34,8 +33,8 @@ const HomeScreen = ({ navigation }) => {
     }, []);
 
     // Lọc tour phổ biến (không giảm giá) và tour ưu đãi (có giảm giá)
-    const popularTrips = filterPopular(tours).slice(0, 6);
-    const discountedTrips = filterDiscountTours(tours).slice(0, 6);
+    const popularTrips = filterPopular(tours).slice(0, 4);
+    const discountedTrips = filterDiscountTours(tours).slice(0, 4);
 
     const renderFilters = ({ item }) => (
         <TouchableOpacity
@@ -114,7 +113,7 @@ const HomeScreen = ({ navigation }) => {
                         <View style={stylesLocal.sectionHeader}>
                             <Text style={styles.sectionTitle}>Phổ biến</Text>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('PageTour', { type: 'popular' })}
+                                onPress={() => navigation.navigate('PageTour', { filterType: 'popular' })}
                             >
                                 <Text style={stylesLocal.viewMore}>Xem Thêm</Text>
                             </TouchableOpacity>
@@ -172,7 +171,7 @@ const HomeScreen = ({ navigation }) => {
                         <View style={stylesLocal.sectionHeader}>
                             <Text style={styles.sectionTitle}>Ưu đãi giảm giá</Text>
                             <TouchableOpacity
-                                onPress={() => navigation.navigate('PageTour', { type: 'discounted' })}
+                                onPress={() => navigation.navigate('PageTour', { filterType: 'discounted' })}
                             >
                                 <Text style={stylesLocal.viewMore}>Xem Thêm</Text>
                             </TouchableOpacity>

@@ -5,12 +5,14 @@ import { BellRing } from 'lucide-react-native';
 import { COLORS } from '../../stysles/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getNotifications } from '../../api/Notification';
+import { ToursContext } from '../../contexts/ToursContext';
 
 const TopBar = ({ navigation }) => {
   const [hasNotifications, setHasNotifications] = useState(false);
   const [notificationCount, setNotificationCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
 
+  
   // Lấy thông báo để kiểm tra số thông báo chưa đọc
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -33,13 +35,12 @@ const TopBar = ({ navigation }) => {
     const handleSearch = () => {
         if (searchQuery.trim()) {
             navigation.navigate('PageTour', {
-                filterType: 'search',
+                filterType: 'searchkeyword',
                 value: searchQuery.trim(),
             });
             setSearchQuery(''); // Xóa input sau khi tìm kiếm
         }
     };
-
   return (
     <View style={styles.container}>
       <TextInput

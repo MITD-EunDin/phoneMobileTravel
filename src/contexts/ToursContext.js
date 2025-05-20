@@ -63,8 +63,16 @@ export const filterDiscountTours = (allTours) =>
 export const filterPopular = (allTours) =>
     allTours.filter((tour) => tour.discount === 0 || tour.discount < 0 );
 
-export const filterRegion = (allTours) => 
+export const filterRegion = (allTours, region) => 
     allTours.filter((tour) => tour.region?.toLowerCase() === region.toLowerCase());
 
-export const filterDuration = (allTours) =>
+export const filterDuration = (allTours, duration) =>
     allTours.filter((tour) => tour.duration?.toLowerCase() === duration.toLowerCase());
+
+export const filterKeyword = (allTours, keyword) => {
+    const lowerKeyword = keyword.toLowerCase();
+    return allTours.filter(tour =>
+        tour.keyword?.toLowerCase().includes(lowerKeyword) ||
+        tour.tourName?.toLowerCase().includes(lowerKeyword)
+    );
+};

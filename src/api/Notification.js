@@ -3,7 +3,7 @@ import axios from 'axios';
 // Địa chỉ base URL của backend
 
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://10.0.0.111:8080';
 
 
 // Tạo instance của axios với cấu hình mặc định

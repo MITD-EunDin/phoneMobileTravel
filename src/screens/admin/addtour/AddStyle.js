@@ -1,109 +1,126 @@
-import { StyleSheet } from 'react-native';
-import { COLORS } from '../../../stysles/theme';
+import { StyleSheet, Dimensions } from 'react-native';
+
+// Lấy kích thước màn hình để responsive
+const { width, height } = Dimensions.get('window');
+
+import COLORS from'../../../stysles/theme';
 
 const styles = StyleSheet.create({
-  container: {
+  form: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
+    
     padding: 20,
   },
-  formContainer: {
-    width: '100%',
-    maxWidth: 600,
-    alignSelf: 'center',
-  },
-  inputGroup: {
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 20,
   },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    padding: 10,
+
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
+  formRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+  },
+
+  formGroup: {
+    flex: 1,
+    marginRight: 10,
+  },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 5,
+    borderColor: '#6885C1',
+     backgroundColor: '#FBFBFB',
+    padding: 10,
     fontSize: 16,
-    color: COLORS.black,
-    backgroundColor: COLORS.white,
   },
-  textArea: {
+  
+  picker: {
     borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: COLORS.black,
-    backgroundColor: COLORS.white,
-    minHeight: 100,
+    borderRadius: 5,
+    height: 50,
+  },
+  textarea: {
+    height: 100,
     textAlignVertical: 'top',
   },
-  imageUploadButton: {
+
+  imageUpload: {
+    marginTop: 10,
+  },
+  imagePreviews: {
     flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.ivory,
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 5,
+    flexWrap: 'wrap',
   },
-  imageUploadText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#555',
+  imagePreviewContainer: {
+    position: 'relative',
+    marginRight: 10,
+    marginBottom: 10,
   },
-  saveButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.blue,
-    padding: 12,
-    borderRadius: 8,
-    justifyContent: 'center',
-    marginTop: 20,
-    marginBottom: 50,
+  previewImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 5,
   },
-  saveButtonText: {
-    marginLeft: 10,
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  selectTrigger: { 
-    borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: COLORS.black,
-    backgroundColor: COLORS.white,
-    justifyContent: 'space-between',  
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  selectValue: {  
-    fontSize: 16,
-    color: COLORS.black,
-  },
-  selectContent: {  
-    borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: 8,
-    marginTop: 5,
-    backgroundColor: COLORS.white,
+  removeImageButton: {
     position: 'absolute',
-    zIndex: 10,
-    width: '100%', 
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  selectItem: {  
-    padding: 12,
+  removeImageText: {
     fontSize: 16,
-    color: COLORS.black,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    fontWeight: 'bold',
+  },
+  imagePlaceholder: {
+    width: 100,
+    height: 100,
+    borderWidth: 1,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    fontSize: 14,
+  },
+
+  submitButton: {
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
-
 
 export default styles;

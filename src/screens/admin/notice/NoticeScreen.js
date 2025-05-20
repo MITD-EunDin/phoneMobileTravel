@@ -9,6 +9,7 @@ import {
   Platform,
   ActivityIndicator,
   FlatList,
+  Alert,
 } from "react-native";
 import { X, Mail, MailOpen, Plus } from "lucide-react-native";
 import {
@@ -69,7 +70,7 @@ const mapTypeToTab = (type) => {
     case "PAYMENT_SUCCESS":
       return "Thanh toán";
     case "SUCCESS":
-      return "Thanh toán"; // Hỗ trợ type cũ
+      return "Thanh toán";
     case "DEPOSIT_SUCCESS":
       return "Đặt cọc";
     default:
@@ -120,13 +121,12 @@ export default function Notice() {
   const [formData, setFormData] = useState({
     title: "",
     message: "",
-    daysValid: 3,
-  });
+    daysValid: "",
+  }); // Khởi tạo daysValid là chuỗi rỗng để người dùng nhập
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState(null);
   const wsRef = useRef(null);
 
-  // Hàm lấy token từ AsyncStorage
   const getToken = async () => {
     try {
       return await AsyncStorage.getItem("token");
@@ -136,7 +136,6 @@ export default function Notice() {
     }
   };
 
-  // Khởi tạo token và kiểm tra quyền admin
   useEffect(() => {
     const fetchTokenAndInitialize = async () => {
       const fetchedToken = await getToken();
@@ -150,31 +149,20 @@ export default function Notice() {
     fetchTokenAndInitialize();
   }, []);
 
-  // Lấy danh sách thông báo
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!token) return;
       try {
         setLoading(true);
-        console.log(
-          "Fetching notifications, isAdminUser:",
-          isAdminUser,
-          "activeTab:",
-          activeTab
-        );
         const data = isAdminUser
           ? await getAllNotifications(token)
           : await getNotifications(token);
-        console.log("API Notifications:", data);
         const mappedData = data.map(mapNotification);
         const sortedData = mappedData.sort((a, b) => {
-          const idA =
-            typeof a.id === "string" && !isNaN(a.id) ? parseInt(a.id) : a.id;
-          const idB =
-            typeof b.id === "string" && !isNaN(b.id) ? parseInt(b.id) : b.id;
+          const idA = typeof a.id === "string" && !isNaN(a.id) ? parseInt(a.id) : a.id;
+          const idB = typeof b.id === "string" && !isNaN(b.id) ? parseInt(b.id) : b.id;
           return idB - idA;
         });
-        console.log("Sorted Notifications:", sortedData);
         setNotifications(sortedData);
       } catch (error) {
         console.error("Error fetching notifications:", error);
@@ -188,12 +176,10 @@ export default function Notice() {
     }
   }, [token, isAdminUser]);
 
-  // Tích hợp WebSocket
   useEffect(() => {
     if (!token) return;
     const userId = getUserIdFromToken(token);
     wsRef.current = connectWebSocket(userId, (notification) => {
-      console.log("WebSocket Notification:", notification);
       const newNotification = mapNotification({
         id: notification.id || generateUniqueId(),
         title: notification.title,
@@ -202,9 +188,7 @@ export default function Notice() {
         isActive: true,
         isRead: false,
         createdAt: new Date().toISOString(),
-        expiresAt: new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000
-        ).toISOString(),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       });
       setNotifications((prev) => [newNotification, ...prev]);
     });
@@ -213,15 +197,11 @@ export default function Notice() {
     };
   }, [token]);
 
-  // Đánh dấu thông báo đã đọc
   const handleMarkAsRead = async (notificationId) => {
     try {
-      console.log("Marking as read, ID:", notificationId);
       await markNotificationAsRead(notificationId, token);
       setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === notificationId ? { ...n, status: "Đã đọc" } : n
-        )
+        prev.map((n) => (n.id === notificationId ? { ...n, status: "Đã đọc" } : n))
       );
       if (selectedNotification?.id === notificationId) {
         setSelectedNotification({ ...selectedNotification, status: "Đã đọc" });
@@ -236,7 +216,6 @@ export default function Notice() {
     }
   };
 
-  // Xử lý click thông báo
   const handleNotificationClick = (notification) => {
     setSelectedNotification(notification);
     if (notification.status === "Chưa đọc") {
@@ -244,33 +223,54 @@ export default function Notice() {
     }
   };
 
-  // Xử lý thay đổi form
   const handleFormChange = (name, value) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "daysValid" ? parseInt(value) || 3 : value,
+      [name]: value, // Lưu giá trị thô mà không parse ngay
     }));
   };
 
-  // Gửi thông báo mới
+  const validateForm = () => {
+    if (!formData.title.trim()) {
+      Alert.alert("Lỗi", "Tiêu đề không được để trống!");
+      return false;
+    }
+    if (!formData.message.trim()) {
+      Alert.alert("Lỗi", "Nội dung không được để trống!");
+      return false;
+    }
+    const daysValid = parseInt(formData.daysValid);
+    if (isNaN(daysValid) || daysValid <= 0) {
+      Alert.alert("Lỗi", "Số ngày hiệu lực phải là số nguyên dương!");
+      return false;
+    }
+    return true;
+  };
+
   const handleCreateNotification = async () => {
+    if (!validateForm()) return;
+
     try {
       setLoading(true);
-      await createDiscountNotification(formData, token);
+      await createDiscountNotification(
+        {
+          ...formData,
+          daysValid: parseInt(formData.daysValid), // Chuyển đổi sang số trước khi gửi
+        },
+        token
+      );
       setError(null);
-      setFormData({ title: "", message: "", daysValid: 3 });
+      setFormData({ title: "", message: "", daysValid: "" });
       setShowForm(false);
       setShowInlineForm(false);
-      alert("Thông báo đã được tạo thành công!");
+      Alert.alert("Thành công", "Thông báo đã được tạo thành công!");
       const data = isAdminUser
         ? await getAllNotifications(token)
         : await getNotifications(token);
       const mappedData = data.map(mapNotification);
       const sortedData = mappedData.sort((a, b) => {
-        const idA =
-          typeof a.id === "string" && !isNaN(a.id) ? parseInt(a.id) : a.id;
-        const idB =
-          typeof b.id === "string" && !isNaN(b.id) ? parseInt(b.id) : b.id;
+        const idA = typeof a.id === "string" && !isNaN(a.id) ? parseInt(a.id) : a.id;
+        const idB = typeof b.id === "string" && !isNaN(b.id) ? parseInt(b.id) : b.id;
         return idB - idA;
       });
       setNotifications(sortedData);
@@ -286,26 +286,22 @@ export default function Notice() {
     }
   };
 
-  // Ẩn form
   const handleCloseForm = () => {
     setShowForm(false);
-    setFormData({ title: "", message: "", daysValid: 3 });
+    setFormData({ title: "", message: "", daysValid: "" });
     setError(null);
   };
 
-  // Xử lý click vào modal header
   const handleModalHeaderClick = () => {
     setShowInlineForm(true);
     setShowForm(false);
   };
 
-  // Lọc thông báo theo tab
   const filteredNotifications =
     activeTab === "Tất cả"
       ? notifications
       : notifications.filter((n) => n.type === activeTab);
 
-  // Render tab item cho FlatList
   const renderTabItem = ({ item }) => (
     <TouchableOpacity
       style={[styles.tabButton, activeTab === item ? styles.tabButtonActive : null]}
@@ -324,10 +320,7 @@ export default function Notice() {
 
   return (
     <View style={styles.container}>
-      {/* Hiển thị lỗi nếu có */}
       {error && <Text style={styles.error}>{error}</Text>}
-
-      {/* Loading state */}
       {loading && (
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingBox}>
@@ -336,8 +329,6 @@ export default function Notice() {
           </View>
         </View>
       )}
-
-      {/* Tabs */}
       <View style={styles.List}>
       <FlatList
         horizontal
@@ -348,8 +339,7 @@ export default function Notice() {
         contentContainerStyle={{ height: 50 }}
         showsHorizontalScrollIndicator={false}
       />
-</View>
-      {/* Danh sách thông báo */}
+      </View>
       <ScrollView style={styles.notificationList}>
         <Text style={styles.listHeader}>
           Danh sách thông báo ({filteredNotifications.length})
@@ -373,9 +363,7 @@ export default function Notice() {
                 )}
               </View>
               <View style={styles.notificationContent}>
-                <Text style={styles.notificationTitle}>
-                  {notification.title}
-                </Text>
+                <Text style={styles.notificationTitle}>{notification.title}</Text>
                 <Text style={styles.notificationDate}>
                   {new Date(notification.date).toLocaleString()}
                 </Text>
@@ -387,8 +375,6 @@ export default function Notice() {
           ))
         )}
       </ScrollView>
-
-      {/* Hiển thị thông báo chi tiết */}
       {selectedNotification && (
         <View style={styles.detailPanel}>
           <TouchableOpacity
@@ -401,16 +387,12 @@ export default function Notice() {
           <Text style={styles.detailDate}>
             {new Date(selectedNotification.date).toLocaleString()}
           </Text>
-          <Text style={styles.detailContent}>
-            {selectedNotification.content}
-          </Text>
+          <Text style={styles.detailContent}>{selectedNotification.content}</Text>
           <Text style={styles.detailSender}>
             Người gửi: {selectedNotification.sender}
           </Text>
         </View>
       )}
-
-      {/* Form tạo thông báo (modal) */}
       {showForm && (
         <Modal isVisible={showForm} onBackdropPress={handleCloseForm}>
           <View style={styles.modalContent}>
@@ -447,9 +429,9 @@ export default function Notice() {
               <Text style={styles.formLabel}>Số ngày hiệu lực</Text>
               <TextInput
                 style={styles.formInput}
-                value={String(formData.daysValid)}
+                value={formData.daysValid}
                 onChangeText={(text) => handleFormChange("daysValid", text)}
-                placeholder="Số ngày"
+                placeholder="Nhập số ngày"
                 keyboardType="numeric"
               />
               <View style={styles.formActions}>
@@ -470,8 +452,6 @@ export default function Notice() {
           </View>
         </Modal>
       )}
-
-      {/* Form inline khi click modal header */}
       {showInlineForm && (
         <View style={styles.inlineFormContainer}>
           <View style={styles.modalContent}>
@@ -505,9 +485,9 @@ export default function Notice() {
               <Text style={styles.formLabel}>Số ngày hiệu lực</Text>
               <TextInput
                 style={styles.formInput}
-                value={String(formData.daysValid)}
+                value={formData.daysValid}
                 onChangeText={(text) => handleFormChange("daysValid", text)}
-                placeholder="Số ngày"
+                placeholder="Nhập số ngày"
                 keyboardType="numeric"
               />
               <View style={styles.formActions}>
@@ -528,8 +508,6 @@ export default function Notice() {
           </View>
         </View>
       )}
-
-      {/* Nút thêm thông báo cho admin */}
       {isAdminUser && (
         <TouchableOpacity
           style={styles.addButton}

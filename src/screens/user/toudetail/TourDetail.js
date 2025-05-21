@@ -3,6 +3,7 @@ import { View, Text, Image, FlatList, ScrollView, StyleSheet, Dimensions, Toucha
 import { FontAwesome5 } from '@expo/vector-icons';
 import styles from './DetailStyle';
 import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const { width } = Dimensions.get('window');
 const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/600x400.png?text=Image+Not+Available';
@@ -144,27 +145,25 @@ const TourDetails = ({ route }) => {
         <TouchableOpacity
           style={styles.bookingButton}
           onPress={() => {
-            Alert.alert(
-              'Xác nhận đặt tour',
-              `Bạn có muốn đặt tour ${tour.tourName} với giá ${tour.newPrice.toLocaleString()} VNĐ?`,
-              [
-                { text: 'Hủy', style: 'cancel' },
-                {
-                  text: 'Đặt',
-                  onPress: () => navigation.navigate('Booking', {
-                    tourId: tour.tourId,
-                    tourName: tour.tourName,
-                    price: tour.newPrice,
-                    duration: tour.duration,
-                    transportation: tour.transportation,
-                    accommodation: tour.accommodation,
-                    firstImage: tour.images[0],
-                    departureDate: tour.tourSchedules?.[0]?.departureDate || null,
-                    tourScheduleId: tour.tourSchedules?.[0]?.id || null
-                  }),
-                },
-              ]
-            );
+            Toast.show({
+              type: 'info', // success | error | info
+              text1: 'Đặt tour thành công 🎉',
+              text2: `Tour: ${tour.tourName} | Giá: ${tour.newPrice.toLocaleString()} VNĐ`,
+              onHide: () => {
+                navigation.navigate('Booking', {
+                  tourId: tour.tourId,
+                  tourName: tour.tourName,
+                  price: tour.newPrice,
+                  duration: tour.duration,
+                  transportation: tour.transportation,
+                  accommodation: tour.accommodation,
+                  firstImage: tour.images[0],
+                  departureDate: tour.tourSchedules?.[0]?.departureDate || null,
+                  tourScheduleId: tour.tourSchedules?.[0]?.id || null,
+                });
+              },
+              visibilityTime: 1500,
+            });
           }}
         >
           <Text style={styles.bookingButtonText}>Đặt tour</Text>

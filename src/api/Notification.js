@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Địa chỉ base URL của backend
-const API_URL = 'http://192.168.0.103:8080';
+const API_URL = 'http://192.168.222.229:8080';
 
 // Tạo instance của axios với cấu hình mặc định
 const api = axios.create({
@@ -114,7 +114,7 @@ export const connectWebSocket = (userId, onMessage) => {
         console.log('WebSocket disconnected, attempting to reconnect...');
         setTimeout(() => connectWebSocket(userId, onMessage), 5000); // Thử lại sau 5s
     };
-    ws.onerror = (error) => console.error('WebSocket error:', error);
+    // ws.onerror = (error) => console.error('WebSocket error:', error);
     return ws;
 };
 

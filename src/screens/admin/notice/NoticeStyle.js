@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    padding: 24, // 1.5rem = 24dp
+    padding: 12, // 1.5rem = 24dp
     backgroundColor: "#f3f4f6", // bg-gray-100
   },
 
@@ -57,10 +57,10 @@ const styles = StyleSheet.create({
 
   // Button for adding notification
   addButton: {
-    zIndex:999,
+    zIndex: 999,
     position: 'absolute',
-    display:'flex',
-    flexDirection:'row',
+    display: 'flex',
+    flexDirection: 'row',
     bottom: 20,
     right: 20,
     paddingVertical: 8, // 0.5rem
@@ -97,8 +97,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 50,
   },
-  List:{
-height:'fit-content',
+  List: {
+    height: 'fit-content',
   },
 
   modalContent: {
@@ -220,7 +220,7 @@ height:'fit-content',
   // Tabs
   tabs: {
     marginBottom: 16,
-     height:50,
+    height: 50,
   },
   tabButton: {
     paddingVertical: 8,
@@ -228,7 +228,7 @@ height:'fit-content',
     borderRadius: 6,
     backgroundColor: "#e5e7eb",
     marginRight: 8,
-    height:'fit-content',
+    height: 'fit-content',
   },
   tabButtonText: {
     color: "#374151",
@@ -249,10 +249,8 @@ height:'fit-content',
     borderColor: "#e5e7eb",
     borderRadius: 8, // 0.5rem
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
-    elevation: 3,
     maxHeight: 600,
     backgroundColor: "#ffffff",
   },
@@ -309,7 +307,8 @@ height:'fit-content',
   notificationTime: {
     width: width * 0.33333333, // 33.333333%
     textAlign: "center",
-    fontSize: 16,
+    fontSize: 12,
+    paddingRight: 40,
   },
 
   // Notification detail panel

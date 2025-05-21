@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 // Địa chỉ base URL của backend
 
 // const API_URL = Platform.OS === 'android' ? 'http://192.168.53.232:8080' : 'http://localhost:8080';
-const API_URL = 'http://192.168.0.103:8080';
+const API_URL = 'http://192.168.222.229:8080';
 
 // Tạo instance của axios với cấu hình mặc định
 const api = axios.create({
@@ -55,7 +55,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         await AsyncStorage.multiRemove(['token', 'refreshToken']);
-        console.error('Refresh Token Error:', refreshError);
+        // console.error('Refresh Token Error:', refreshError);
         return Promise.reject(new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'));
       }
     }

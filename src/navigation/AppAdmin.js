@@ -25,7 +25,7 @@ const AdminTabNavigator = ({ onLogout }) => (
       name="Dashboard"
       component={DashboardScreen}
       options={{
-        header: (props) => <CommonHeader {...props} title="Thống kê" />,
+        header: (props) => <CommonHeader {...props} title="Thống kê" showBackButton={false} />,
         tabBarIcon: ({ color, size, focused }) => (
           <ChartPie color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
@@ -35,7 +35,7 @@ const AdminTabNavigator = ({ onLogout }) => (
       name="Đơn hàng"
       component={Goods}
       options={{
-        header: (props) => <CommonHeader {...props} title="Đơn hàng" />,
+        header: (props) => <CommonHeader {...props} title="Đơn hàng" showBackButton={false} />,
         tabBarIcon: ({ color, size, focused }) => (
           <ShoppingBag color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
@@ -45,7 +45,7 @@ const AdminTabNavigator = ({ onLogout }) => (
       name="Quản lý tour"
       component={ManageTour}
       options={{
-        header: (props) => <CommonHeader {...props} title="Quản lý tour" />,
+        header: (props) => <CommonHeader {...props} title="Quản lý tour" showBackButton={false} />,
         tabBarIcon: ({ color, size, focused }) => (
           <NotepadText color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
@@ -55,7 +55,7 @@ const AdminTabNavigator = ({ onLogout }) => (
       name="Thông báo"
       component={Notice}
       options={{
-        header: (props) => <CommonHeader {...props} title="Thông báo" />,
+        header: (props) => <CommonHeader {...props} title="Thông báo" showBackButton={false} />,
         tabBarIcon: ({ color, size, focused }) => (
           <Hourglass color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),
@@ -64,7 +64,7 @@ const AdminTabNavigator = ({ onLogout }) => (
     <Tab.Screen
       name="Tài khoản"
       options={{
-        header: (props) => <CommonHeader {...props} title="Tài khoản" />,
+        header: (props) => <CommonHeader {...props} title="Tài khoản" showBackButton={false} />,
         tabBarIcon: ({ color, size, focused }) => (
           <ShieldUser color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
         ),

@@ -59,8 +59,8 @@ const DashBroad = () => {
 
   return (
     <View style={styles.container}>
-    {/* Tab lọc */}
-    <View style={styles.tabContainer}>
+      {/* Tab lọc */}
+      <View style={styles.tabContainer}>
         <FlatList
           data={tabs}
           renderItem={renderTab}

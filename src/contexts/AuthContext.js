@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Lỗi đăng nhập:", error);
       throw new Error(
         "Đăng nhập thất bại: " +
-          (error.message || "Thông tin đăng nhập không hợp lệ.")
+        (error.message || "Thông tin đăng nhập không hợp lệ.")
       );
     }
   };
@@ -150,10 +150,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Đăng xuất
-  const logout = () => {
-    removeTokenFromStorage();
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    try {
+      await AsyncStorage.multiRemove(['token', 'refreshToken', 'userData']);
+      setUser(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      throw new Error('Lỗi khi đăng xuất: ' + error.message);
+    }
   };
 
   // Kiểm tra token khi component mount

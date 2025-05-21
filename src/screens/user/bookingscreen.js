@@ -3,6 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert,
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../../stysles/theme';
 import { bookTour } from '../../api/BookingApi';
+import Toast from 'react-native-toast-message';
+
 
 const BookingScreen = ({ route }) => {
     const { tourId, tourName = 'Không có tên tour', price, duration, transportation, accommodation, firstImage, departureDate, tourScheduleId } = route.params || {};
@@ -13,8 +15,8 @@ const BookingScreen = ({ route }) => {
     const [email, setEmail] = useState('');
     const [citizen, setCitizen] = useState('');
     const [address, setAddress] = useState('');
-    const [adults, setAdults] = useState('1');
-    const [children, setChildren] = useState('0');
+    const [adults, setAdults] = useState(1);
+    const [children, setChildren] = useState(0);
     const [selectedDate, setSelectedDate] = useState(departureDate ? new Date(departureDate) : new Date()); // Khởi tạo từ departureDate hoặc hôm nay
 
 
@@ -43,8 +45,8 @@ const BookingScreen = ({ route }) => {
 
         const bookingData = {
             tourId,
-            adults: parseInt(adults),
-            children: parseInt(children),
+            adultQuantity: parseInt(adults),
+            childQuantity: parseInt(children),
             tourScheduleId,
         };
 
@@ -53,19 +55,15 @@ const BookingScreen = ({ route }) => {
             const bookingResult = await bookTour(bookingData, navigation);
 
             // Hiển thị thông báo đặt tour thành công
-            Alert.alert(
-                'Thành công',
-                'Đặt tour thành công! Vui lòng kiểm tra email để xem chi tiết.',
-                [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            // Điều hướng về HomeScreen sau khi đặt tour thành công
-                            navigation.navigate('CustomerTabs', { screen: 'Home' });
-                        },
-                    },
-                ]
-            );
+            Toast.show({
+                type: 'success',
+                text1: 'Đặt tour thành công ✅',
+                visibilityTime: 2000,
+                onHide: () => {
+                    // Điều hướng về HomeScreen sau khi toast biến mất
+                    navigation.navigate('CustomerTabs', { screen: 'Home' });
+                },
+            });
         } catch (error) {
             Alert.alert('Lỗi', 'Đặt tour thất bại. Vui lòng thử lại.');
         }

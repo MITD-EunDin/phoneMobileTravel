@@ -12,8 +12,8 @@ const MenuScreen = ({ navigation }) => {
     try {
       await logout(); // Chỉ gọi logout, AppNavigator sẽ xử lý điều hướng
     } catch (error) {
-      console.error('Logout error:', error);
-      Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+      // console.error('Logout error:', error);
+      // Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
     }
   };
 

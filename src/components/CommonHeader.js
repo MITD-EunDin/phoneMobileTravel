@@ -1,19 +1,25 @@
 import React from 'react';
-import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, Platform } from 'react-native';
 import { COLORS } from '../stysles/theme';
 import BackButton from '../components/Buttons/BackButton';
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation
+import { useNavigation } from '@react-navigation/native';
 
-
-const CommonHeader = ({ title }) => {
+const CommonHeader = ({ title, showBackButton = true }) => {
   const navigation = useNavigation();
+
   return (
-    <View style={styles.header}>
+    <>
       <StatusBar backgroundColor={COLORS.blue} barStyle="light-content" />
-      <BackButton onPress={() => navigation.goBack()} />
-      <Text style={styles.headerTitle}>{title}</Text>
-      <View style={styles.headerRight} />
-    </View>
+      <View style={styles.header}>
+        {showBackButton ? (
+          <BackButton onPress={() => navigation.goBack()} />
+        ) : (
+          <View style={{ width: 40 }} /> // giữ layout cân đối
+        )}
+        <Text style={styles.headerTitle}>{title}</Text>
+        <View style={styles.headerRight} />
+      </View>
+    </>
   );
 };
 
@@ -22,8 +28,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.blue,
     flexDirection: 'row',
     alignItems: 'center',
-    height: 60,
-    paddingTop: StatusBar.currentHeight || 0,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 40, // đảm bảo icon không đè status bar
+    height: Platform.OS === 'android' ? 50 + (StatusBar.currentHeight || 0) : 110,
     paddingHorizontal: 15,
     justifyContent: 'space-between',
     elevation: 4,
@@ -34,9 +40,10 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
+    bottom: 10,
   },
   headerRight: {
     width: 40,

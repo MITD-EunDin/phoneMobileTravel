@@ -18,7 +18,7 @@ const handleUnauthorized = async (navigation) => {
     }
 };
 
-const API_URL = 'http://192.168.0.103:8080';
+const API_URL = 'http://192.168.222.229:8080';
 
 const API = axios.create({
     baseURL: API_URL,

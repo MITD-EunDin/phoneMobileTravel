@@ -44,7 +44,7 @@ const ManageTour = ({ navigation }) => {
     >
       <View style={styles.tourDetails}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text style={styles.tourCode}>{item.code || 'N/A'}</Text>
+          <Text style={styles.tourCode}>{item.code}</Text>
           <View style={{ flexDirection: 'row' }}>
             <Text style={{ color: COLORS.blue }}>Chi tiết</Text>
             <ChevronRight color={COLORS.blue} size={20} />

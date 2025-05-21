@@ -7,9 +7,9 @@ import { getAllBookings } from '../../../api/BookingApi.js'; // Import API
 
 const Goods = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [tours, setTours] = useState([]); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null); 
+  const [tours, setTours] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Hàm lấy dữ liệu từ API
   useEffect(() => {
@@ -18,10 +18,10 @@ const Goods = ({ navigation }) => {
         setLoading(true);
         const bookings = await getAllBookings();
         const mappedTours = bookings.map((booking) => ({
-          id: booking.id.toString(), 
+          id: booking.id.toString(),
           code: booking.code || 'N/A',
           status: booking.status || 'Chưa xác định',
-          statusColor: booking.statusColor || getStatusColor(booking.status), 
+          statusColor: booking.statusColor || getStatusColor(booking.status),
           customerName: booking.customerName || 'Khách hàng không xác định',
           tourName: booking.tourName || 'Tour không xác định',
           phone: booking.phone || 'N/A',
@@ -29,7 +29,7 @@ const Goods = ({ navigation }) => {
         }));
         setTours(mappedTours);
       } catch (err) {
-        console.error('Lỗi khi lấy danh sách tour:', err);
+        // console.error('Lỗi khi lấy danh sách tour:', err);
         setError('Không thể tải danh sách tour. Vui lòng thử lại sau.');
       } finally {
         setLoading(false);

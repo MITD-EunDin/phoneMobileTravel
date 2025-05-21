@@ -3,12 +3,12 @@ import { StyleSheet, Dimensions } from 'react-native';
 // Lấy kích thước màn hình để responsive
 const { width, height } = Dimensions.get('window');
 
-import COLORS from'../../../stysles/theme';
+import COLORS from '../../../stysles/theme';
 
 const styles = StyleSheet.create({
   form: {
     flex: 1,
-    
+
     padding: 20,
   },
 
@@ -51,15 +51,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     borderColor: '#6885C1',
-     backgroundColor: '#FBFBFB',
+    backgroundColor: '#FBFBFB',
     padding: 10,
     fontSize: 16,
   },
-  
+
   picker: {
     borderWidth: 1,
     borderRadius: 5,
     height: 50,
+    backgroundColor: '#FBFBFB',
+    borderColor: '#6885C1',
   },
   textarea: {
     height: 100,

@@ -328,7 +328,7 @@ const AddTour = ({ navigation, route }) => {
               placeholder="Nhập ngày (VD: 2025-05-20)"
             />
           </View>
-          
+
         </View>
       )}
 

@@ -12,6 +12,7 @@ import TopBar from '../components/Top/TopBar';
 import Notice from '../screens/user/notice/Notice';
 import BookingScreen from '../screens/user/bookingscreen';
 import { Home, Map, ShoppingBag, User } from 'lucide-react-native';
+import { NotificationProvider } from '../contexts/NotificationContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -59,6 +60,7 @@ const CustomerTabNavigator = ({ onLogout, navigation }) => (
                 tabBarIcon: ({ color, size, focused }) => (
                     <User color={color} size={size} strokeWidth={focused ? 2.5 : 2} />
                 ),
+                tabBarStyle: { display: 'none' },
             }}
         >
             {(props) => <AccountScreen {...props} onLogout={onLogout} />}
@@ -68,46 +70,48 @@ const CustomerTabNavigator = ({ onLogout, navigation }) => (
 
 const CustomerNavigator = ({ onLogout }) => {
     return (
-        <Stack.Navigator>
-            <Stack.Screen
-                name="CustomerTabs"
-                options={{ headerShown: false }}
-            >
-                {(props) => <CustomerTabNavigator {...props} onLogout={onLogout} />}
-            </Stack.Screen>
-            <Stack.Screen
-                name="TourDetails"
-                component={TourDetails}
-                options={{
-                    header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />,
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="PageTour"
-                component={PageTour}
-                options={{
-                    header: (props) => <CommonHeader {...props} title="Danh Sách Tour" />,
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="Notice"
-                component={Notice}
-                options={{
-                    header: (props) => <CommonHeader {...props} title="Thông báo" />,
-                    headerShown: true,
-                }}
-            />
-            <Stack.Screen
-                name="Booking"
-                component={BookingScreen}
-                options={{
-                    header: (props) => <CommonHeader {...props} title="Đặt Tour" />,
-                    headerShown: true,
-                }}
-            />
-        </Stack.Navigator>
+        <NotificationProvider>
+            <Stack.Navigator>
+                <Stack.Screen
+                    name="CustomerTabs"
+                    options={{ headerShown: false }}
+                >
+                    {(props) => <CustomerTabNavigator {...props} onLogout={onLogout} />}
+                </Stack.Screen>
+                <Stack.Screen
+                    name="TourDetails"
+                    component={TourDetails}
+                    options={{
+                        header: (props) => <CommonHeader {...props} title="Chi Tiết Tour" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="PageTour"
+                    component={PageTour}
+                    options={{
+                        header: (props) => <CommonHeader {...props} title="Danh Sách Tour" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="Notice"
+                    component={Notice}
+                    options={{
+                        header: (props) => <CommonHeader {...props} title="Thông báo" />,
+                        headerShown: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="Booking"
+                    component={BookingScreen}
+                    options={{
+                        header: (props) => <CommonHeader {...props} title="Đặt Tour" />,
+                        headerShown: true,
+                    }}
+                />
+            </Stack.Navigator>
+        </NotificationProvider>
     );
 };
 

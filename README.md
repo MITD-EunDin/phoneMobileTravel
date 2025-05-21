@@ -1,5 +1,5 @@
 # phoneMobileTravel
-
+# Thành viên: Tôn Văn Diên (MITD-EunDin), Đỗ Mạnh Cường(Cuonghoclaptrinh), Nguyễn Thị Trinh(nguyenthitrinh1)
 # @react-navigation/bottom-tabs
 
 # @react-navigation/stack
